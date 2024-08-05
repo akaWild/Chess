@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIService", "api\AIService\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedLib", "api\SharedLib\SharedLib.csproj", "{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService", "api\AuthService\AuthService.csproj", "{1386FDF7-4E33-46F7-A895-67391D8FAA6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1386FDF7-4E33-46F7-A895-67391D8FAA6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1386FDF7-4E33-46F7-A895-67391D8FAA6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1386FDF7-4E33-46F7-A895-67391D8FAA6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1386FDF7-4E33-46F7-A895-67391D8FAA6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,6 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D6960D46-3505-47FE-82AC-278CA70994CA} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 		{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
+		{1386FDF7-4E33-46F7-A895-67391D8FAA6A} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {450B3182-62D6-4063-95C8-ED6D368B6536}
