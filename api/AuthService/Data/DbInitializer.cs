@@ -1,23 +1,25 @@
 ﻿using AuthService.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Data
 {
     public class DbInitializer
     {
-        public static void InitDb(WebApplication app)
+        public static async Task InitDb(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
 
             var dbContext = scope.ServiceProvider.GetService<DataContext>();
+            var userManager = scope.ServiceProvider.GetService<UserManager<AppUser>>();
 
-            if (dbContext != null)
-                SeedData(dbContext);
+            if (dbContext != null && userManager != null)
+                await SeedData(dbContext, userManager);
         }
 
-        private static void SeedData(DataContext context)
+        private static async Task SeedData(DataContext context, UserManager<AppUser> userManager)
         {
-            context.Database.Migrate();
+            await context.Database.MigrateAsync();
 
             if (context.Users.Any())
                 return;
@@ -38,9 +40,8 @@ namespace AuthService.Data
                 },
             };
 
-            context.Users.AddRange(users);
-
-            context.SaveChanges();
+            foreach (var user in users)
+                await userManager.CreateAsync(user, "Password123");
         }
     }
 }
