@@ -23,6 +23,12 @@ namespace SharedLib.Exceptions
                     responseException.GetType().Name,
                     httpContext.Response.StatusCode = responseException.StatusCode
                 ),
+                BadHttpRequestException =>
+                (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status400BadRequest
+                ),
                 _ =>
                 (
                     exception.Message,
