@@ -64,7 +64,7 @@ namespace AuthService.Features.Register
             if (result.Succeeded)
                 return _userService.CreateUserDto(user, _tokenService.CreateToken(user));
 
-            string errors = string.Join(Environment.NewLine, result.Errors);
+            string errors = string.Join(Environment.NewLine, result.Errors.Select(e => e.Description));
 
             throw new CustomErrorResponseException(errors, 400);
         }
