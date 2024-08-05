@@ -12,14 +12,15 @@ namespace AuthService.Extensions
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
         {
             services.AddIdentityCore<AppUser>(opt =>
-            {
-                opt.Password.RequireLowercase = true;
-                opt.Password.RequireUppercase = true;
-                opt.Password.RequireDigit = true;
-                opt.Password.RequiredLength = 8;
-                opt.User.RequireUniqueEmail = true;
+                {
+                    opt.Password.RequireNonAlphanumeric = false;
+                    opt.Password.RequireLowercase = true;
+                    opt.Password.RequireUppercase = true;
+                    opt.Password.RequireDigit = true;
+                    opt.Password.RequiredLength = 8;
+                    opt.User.RequireUniqueEmail = true;
 
-            })
+                })
             .AddEntityFrameworkStores<DataContext>();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]!));
