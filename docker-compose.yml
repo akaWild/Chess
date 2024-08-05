@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  postgres:
+    image: postgres
+  authservice:
+    image: akaWild/authservice
+    build:
+      context: .
+      dockerfile: api/AuthService/Dockerfile
+volumes:
+  pgdata:
