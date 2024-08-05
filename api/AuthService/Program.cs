@@ -32,6 +32,6 @@ app.UseAuthorization();
 app.MapCarter();
 app.UseExceptionHandler(options => { });
 
-DbInitializer.InitDb(app);
+await DbInitializer.InitDb(app);
 
 app.Run();
