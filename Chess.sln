@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{E1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIService", "api\AIService\AIService.csproj", "{D6960D46-3505-47FE-82AC-278CA70994CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLib", "api\SharedLib\SharedLib.csproj", "{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedLib", "api\SharedLib\SharedLib.csproj", "{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +37,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D6960D46-3505-47FE-82AC-278CA70994CA} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
+		{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {450B3182-62D6-4063-95C8-ED6D368B6536}
