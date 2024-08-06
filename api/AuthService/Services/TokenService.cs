@@ -15,7 +15,7 @@ namespace AuthService.Services
             _config = config;
         }
 
-        public string CreateToken(AppUser user)
+        public virtual string CreateToken(AppUser user)
         {
             var claims = new List<Claim>
             {
