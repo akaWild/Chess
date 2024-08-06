@@ -5,20 +5,30 @@ using Moq;
 
 namespace AuthService.UnitTests
 {
-    public class TokenServiceTests
+    public class TokenServiceFixture
     {
-        private readonly Mock<IConfiguration> _configMock;
-        private readonly AppUser _appUser;
+        public readonly Mock<IConfiguration> ConfigMock;
+        public readonly AppUser AppUser;
 
-        public TokenServiceTests()
+        public TokenServiceFixture()
         {
-            _configMock = new Mock<IConfiguration>();
-            _appUser = new AppUser
+            ConfigMock = new Mock<IConfiguration>();
+            AppUser = new AppUser
             {
                 DisplayName = "Bobby",
                 UserName = "bob",
                 Email = "bob@test.com"
             };
+        }
+    }
+
+    public class TokenServiceTests : IClassFixture<TokenServiceFixture>
+    {
+        private readonly TokenServiceFixture _fixture;
+
+        public TokenServiceTests(TokenServiceFixture fixture)
+        {
+            _fixture = fixture;
         }
 
         [Fact]
@@ -26,11 +36,11 @@ namespace AuthService.UnitTests
         {
             var tokenKey = "MEgCQQCPbDhohZXk+x+qmz7M49VenP4YsAmNdkNeHlLaeKY3oXRZxmVHePw006+U54VubXfshn7izM4mujXE48x9py/zAgMBAAE=";
 
-            _configMock.Setup(config => config["TokenKey"]).Returns(tokenKey);
+            _fixture.ConfigMock.Setup(config => config["TokenKey"]).Returns(tokenKey);
 
-            var tokenService = new TokenService(_configMock.Object);
+            var tokenService = new TokenService(_fixture.ConfigMock.Object);
 
-            Assert.Null(Record.Exception(() => tokenService.CreateToken(_appUser)));
+            Assert.Null(Record.Exception(() => tokenService.CreateToken(_fixture.AppUser)));
         }
 
         [Fact]
@@ -38,11 +48,11 @@ namespace AuthService.UnitTests
         {
             var tokenKey = "MEgCQQCPbDhohZXk+x+qmz7M49VenP4YsAmNdkNeHlLaeKY3oXRZxmVHePw006+";
 
-            _configMock.Setup(config => config["TokenKey"]).Returns(tokenKey);
+            _fixture.ConfigMock.Setup(config => config["TokenKey"]).Returns(tokenKey);
 
-            var tokenService = new TokenService(_configMock.Object);
+            var tokenService = new TokenService(_fixture.ConfigMock.Object);
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => tokenService.CreateToken(_appUser));
+            Assert.Throws<ArgumentOutOfRangeException>(() => tokenService.CreateToken(_fixture.AppUser));
         }
     }
 }
