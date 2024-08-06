@@ -25,8 +25,8 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore Chess.sln
     - name: Build
       run: dotnet build Chess.sln --configuration ${{ matrix.configuration }}
     - name: Test with the dotnet CLI
-      run: dotnet test
+      run: dotnet test Chess.sln
