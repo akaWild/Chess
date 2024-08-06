@@ -90,7 +90,7 @@ namespace AuthService.UnitTests
         }
 
         [Fact]
-        public async Task Handle_WithCreateUserSuccess_ThrowsCustomErrorResponseException()
+        public async Task Handle_WithCreateUserSuccess_ReturnValidUserDto()
         {
             var fixture = new Fixture();
 
