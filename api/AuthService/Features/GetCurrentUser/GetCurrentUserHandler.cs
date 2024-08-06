@@ -1,9 +1,9 @@
 ﻿using AuthService.DTOs;
 using AuthService.Models;
 using AuthService.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using SharedLib.CQRS;
 using SharedLib.Exceptions;
 using System.Security.Claims;
@@ -36,8 +36,8 @@ namespace AuthService.Features.GetCurrentUser
             if (user == null)
                 throw new CustomErrorResponseException("Unable to get current user info", 400);
 
-            var token = await context.GetTokenAsync("access_token");
-            if (token == null)
+            var token = context.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+            if (string.IsNullOrEmpty(token))
                 throw new CustomErrorResponseException("Unable to get current user info", 400);
 
             return _userService.CreateUserDto(user, token);
