@@ -13,7 +13,7 @@ namespace AuthService.Features.Register
             {
                 var result = await sender.Send(new RegisterCommand(request));
 
-                return Results.Ok(result);
+                return Results.CreatedAtRoute("GetCurrentUser");
             });
         }
     }

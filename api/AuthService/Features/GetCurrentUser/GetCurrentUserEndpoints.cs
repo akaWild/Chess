@@ -12,7 +12,9 @@ namespace AuthService.Features.GetCurrentUser
                 var result = await sender.Send(new GetCurrentUserQuery());
 
                 return Results.Ok(result);
-            }).RequireAuthorization();
+            })
+            .RequireAuthorization()
+            .WithName("GetCurrentUser");
         }
     }
 }
