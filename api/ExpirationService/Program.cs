@@ -25,3 +25,5 @@ builder.Services.AddSingleton<IExpirationCollectionService, ExpirationCollection
 var host = builder.Build();
 
 host.Run();
+
+public partial class Program { }

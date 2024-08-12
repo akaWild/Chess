@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpirationService", "api\Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpirationService.UnitTests", "tests\ExpirationService.UnitTests\ExpirationService.UnitTests.csproj", "{4E637531-87B7-4E40-B2B4-5C5A5608DD06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpirationService.IntegrationTests", "tests\ExpirationService.IntegrationTests\ExpirationService.IntegrationTests.csproj", "{D8325A11-79DE-4EAE-97F7-7CD443A145ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{4E637531-87B7-4E40-B2B4-5C5A5608DD06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E637531-87B7-4E40-B2B4-5C5A5608DD06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E637531-87B7-4E40-B2B4-5C5A5608DD06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8325A11-79DE-4EAE-97F7-7CD443A145ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8325A11-79DE-4EAE-97F7-7CD443A145ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8325A11-79DE-4EAE-97F7-7CD443A145ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8325A11-79DE-4EAE-97F7-7CD443A145ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{1AD9EC01-6472-4862-BDC0-7DE644D0FF0B} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 		{D5563A4C-89D1-4240-B37B-D6ABE1B89ECC} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 		{4E637531-87B7-4E40-B2B4-5C5A5608DD06} = {1008ED2D-26C4-4CA4-AAE2-2EA21D83D0DD}
+		{D8325A11-79DE-4EAE-97F7-7CD443A145ED} = {1008ED2D-26C4-4CA4-AAE2-2EA21D83D0DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {450B3182-62D6-4063-95C8-ED6D368B6536}
