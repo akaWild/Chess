@@ -7,9 +7,9 @@ namespace ExpirationService.Consumers
 {
     public class SideToActChangedConsumer : IConsumer<SideToActChanged>
     {
-        private readonly IExpirationCollection _expirationService;
+        private readonly IExpirationCollectionService _expirationService;
 
-        public SideToActChangedConsumer(IExpirationCollection expirationService)
+        public SideToActChangedConsumer(IExpirationCollectionService expirationService)
         {
             _expirationService = expirationService;
         }

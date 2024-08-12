@@ -6,10 +6,10 @@ namespace ExpirationService.Services
 {
     public class CheckMatchExpiredService : BackgroundService
     {
-        private readonly IExpirationCollection _expirationService;
+        private readonly IExpirationCollectionService _expirationService;
         private readonly IServiceProvider _services;
 
-        public CheckMatchExpiredService(IExpirationCollection expirationService, IServiceProvider services)
+        public CheckMatchExpiredService(IExpirationCollectionService expirationService, IServiceProvider services)
         {
             _expirationService = expirationService;
             _services = services;

@@ -2,7 +2,7 @@
 
 namespace ExpirationService.Interfaces;
 
-public interface IExpirationCollection
+public interface IExpirationCollectionService
 {
     MatchExpirationInfo[] GetExpiredMatches();
 
