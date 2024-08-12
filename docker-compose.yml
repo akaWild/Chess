@@ -3,10 +3,18 @@ version: '3.4'
 services:
   postgres:
     image: postgres
+  rabbitmq:
+    image: rabbitmq:management-alpine
   authservice:
     image: akaWild/authservice
     build:
       context: .
       dockerfile: api/AuthService/Dockerfile
+  expirationservice:
+    image: akaWild/expirationservice
+    build:
+      context: .
+      dockerfile: api/ExpirationService/Dockerfile
+
 volumes:
   pgdata:

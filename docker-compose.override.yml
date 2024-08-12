@@ -10,6 +10,10 @@ services:
       - 5434:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+  rabbitmq:
+    ports:
+      - 5673:5672
+      - 15673:15672
   authservice:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -18,3 +22,10 @@ services:
       - TokenKey=MEgCQQCPbDhohZXk+x+qmz7M49VenP4YsAmNdkNeHlLaeKY3oXRZxmVHePw006+U54VubXfshn7izM4mujXE48x9py/zAgMBAAE=
     ports:
       - 6003:8080
+
+  expirationservice:
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - RabbitMq__Host=rabbitmq
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
