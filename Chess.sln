@@ -17,7 +17,9 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1008ED2D-26C4-4CA4-AAE2-2EA21D83D0DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.UnitTests", "tests\AuthService.UnitTests\AuthService.UnitTests.csproj", "{D69AD597-BA22-49EB-9F9A-55956CC72403}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService.UnitTests", "tests\AuthService.UnitTests\AuthService.UnitTests.csproj", "{D69AD597-BA22-49EB-9F9A-55956CC72403}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsLib", "api\EventsLib\EventsLib.csproj", "{1AD9EC01-6472-4862-BDC0-7DE644D0FF0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{D69AD597-BA22-49EB-9F9A-55956CC72403}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D69AD597-BA22-49EB-9F9A-55956CC72403}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D69AD597-BA22-49EB-9F9A-55956CC72403}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AD9EC01-6472-4862-BDC0-7DE644D0FF0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AD9EC01-6472-4862-BDC0-7DE644D0FF0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AD9EC01-6472-4862-BDC0-7DE644D0FF0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AD9EC01-6472-4862-BDC0-7DE644D0FF0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{3DC90CFC-2E8D-46AC-A7EB-BB3CDEFC313A} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 		{1386FDF7-4E33-46F7-A895-67391D8FAA6A} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 		{D69AD597-BA22-49EB-9F9A-55956CC72403} = {1008ED2D-26C4-4CA4-AAE2-2EA21D83D0DD}
+		{1AD9EC01-6472-4862-BDC0-7DE644D0FF0B} = {E14821EB-EA48-4E5B-8F8E-823A0569BBCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {450B3182-62D6-4063-95C8-ED6D368B6536}
