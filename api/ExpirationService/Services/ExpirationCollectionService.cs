@@ -4,13 +4,13 @@ using System.Collections.Concurrent;
 
 namespace ExpirationService.Services;
 
-sealed class ExpirationCollectionService : IExpirationCollectionService
+public sealed class ExpirationCollectionService : IExpirationCollectionService
 {
     private readonly ConcurrentDictionary<MatchExpirationInfo, bool> _matches = new();
 
     public MatchExpirationInfo[] GetExpiredMatches()
     {
-        var expiredMatches = _matches.Where(kv => kv.Key.ExpTimeUtc >= DateTime.UtcNow).Select(kv => kv.Key).ToArray();
+        var expiredMatches = _matches.Where(kv => kv.Key.ExpTimeUtc <= DateTime.UtcNow).Select(kv => kv.Key).ToArray();
 
         foreach (var match in expiredMatches)
             _matches.TryRemove(match, out _);
@@ -18,16 +18,28 @@ sealed class ExpirationCollectionService : IExpirationCollectionService
         return expiredMatches;
     }
 
-    public void Add(MatchExpirationInfo match)
+    public bool Add(MatchExpirationInfo match)
     {
-        _matches.TryAdd(match, true);
+        return _matches.TryAdd(match, true);
     }
 
-    public void Remove(Guid matchId)
+    public int Remove(Guid matchId)
     {
-        var expiredMatches = _matches.Where(kv => kv.Key.MatchId == matchId).Select(kv => kv.Key);
+        var expiredMatches = _matches.Where(kv => kv.Key.MatchId == matchId).Select(kv => kv.Key).ToArray();
 
         foreach (var match in expiredMatches)
             _matches.TryRemove(match, out _);
+
+        return expiredMatches.Length;
+    }
+
+    public int Count()
+    {
+        return _matches.Count;
+    }
+
+    public int Count(Guid matchId)
+    {
+        return _matches.Count(kv => kv.Key.MatchId == matchId);
     }
 }
