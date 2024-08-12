@@ -6,7 +6,11 @@ public interface IExpirationCollectionService
 {
     MatchExpirationInfo[] GetExpiredMatches();
 
-    void Add(MatchExpirationInfo match);
+    bool Add(MatchExpirationInfo match);
 
-    void Remove(Guid matchId);
+    int Remove(Guid matchId);
+
+    int Count();
+
+    int Count(Guid matchId);
 }
