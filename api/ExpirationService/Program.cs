@@ -20,7 +20,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 builder.Services.AddHostedService<CheckMatchExpiredService>();
-builder.Services.AddSingleton<IExpirationCollection, ExpirationCollection>();
+builder.Services.AddSingleton<IExpirationCollectionService, ExpirationCollectionService>();
 
 var host = builder.Build();
 

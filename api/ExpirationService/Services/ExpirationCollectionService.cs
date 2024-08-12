@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace ExpirationService.Services;
 
-sealed class ExpirationCollection : IExpirationCollection
+sealed class ExpirationCollectionService : IExpirationCollectionService
 {
     private readonly ConcurrentDictionary<MatchExpirationInfo, bool> _matches = new();
 
