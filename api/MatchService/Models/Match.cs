@@ -2,14 +2,8 @@
 {
     public class Match
     {
-        public Match(Guid id, string creator)
-        {
-            MatchId = id;
-            Creator = creator;
-        }
-
-        public Guid MatchId { get; }
-        public string Creator { get; }
+        public required Guid MatchId { get; init; }
+        public required string Creator { get; init; }
         public DateTime CreatedAtUtc { get; } = DateTime.UtcNow;
         public DateTime? StartedAtUtc { get; set; }
         public DateTime? EndedAtUtc { get; set; }
@@ -22,7 +16,7 @@
         public string? Acceptor { get; set; }
         public int? AILevel { get; set; }
         public string? Board { get; set; }
-        public List<string> History { get; } = new();
+        public string[] History { get; set; } = { };
         public string? Winner { get; set; }
         public WinDescriptor? WinBy { get; set; }
         public DrawDescriptor? DrawBy { get; set; }
