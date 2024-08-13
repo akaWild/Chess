@@ -15,6 +15,11 @@ services:
     build:
       context: .
       dockerfile: api/ExpirationService/Dockerfile
+  matchservice:
+    image: akaWild/matchservice
+    build:
+      context: .
+      dockerfile: api/MatchService/Dockerfile
 
 volumes:
   pgdata:

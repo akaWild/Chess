@@ -5,7 +5,8 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "authservice": "StartDebugging",
-        "expirationservice": "StartDebugging"
+        "expirationservice": "StartDebugging",
+        "matchservice": "StartDebugging"
       }
     }
   }
