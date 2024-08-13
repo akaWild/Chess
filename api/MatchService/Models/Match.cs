@@ -4,7 +4,7 @@
     {
         public required Guid MatchId { get; init; }
         public required string Creator { get; init; }
-        public DateTime CreatedAtUtc { get; } = DateTime.UtcNow;
+        public DateTime CreatedAtUtc { get; private set; } = DateTime.UtcNow;
         public DateTime? StartedAtUtc { get; set; }
         public DateTime? EndedAtUtc { get; set; }
         public DateTime? LastMoveMadeAtUtc { get; set; }
