@@ -23,7 +23,7 @@ namespace MatchService.Features.GetCurrentMatch
             var queryParam = httpContext.Request.Query["matchId"];
 
             if (queryParam.Count == 0)
-                throw new HubException("Match Id wasn't provided");
+                return;
 
             var matchId = queryParam[0]!;
 
