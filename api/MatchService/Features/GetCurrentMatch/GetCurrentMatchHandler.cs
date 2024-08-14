@@ -1,4 +1,5 @@
-﻿using MatchService.DTOs;
+﻿using AutoMapper;
+using MatchService.DTOs;
 using MatchService.Interfaces;
 using SharedLib.CQRS;
 
@@ -9,10 +10,12 @@ namespace MatchService.Features.GetCurrentMatch
     public class GetCurrentMatchHandler : IQueryHandler<GetCurrentMatchQuery, MatchInfo>
     {
         private readonly IMatchRepository _matchRepo;
+        private readonly IMapper _mapper;
 
-        public GetCurrentMatchHandler(IMatchRepository matchRepo)
+        public GetCurrentMatchHandler(IMatchRepository matchRepo, IMapper mapper)
         {
             _matchRepo = matchRepo;
+            _mapper = mapper;
         }
 
         public async Task<MatchInfo> Handle(GetCurrentMatchQuery request, CancellationToken cancellationToken)
@@ -21,13 +24,7 @@ namespace MatchService.Features.GetCurrentMatch
             if (match == null)
                 throw new Exception($"Match with id {request.MatchId} wasn't found");
 
-            return new MatchInfo
-            {
-                MatchId = match.MatchId,
-                CreatedAtUtc = match.CreatedAtUtc,
-                Creator = match.Creator,
-                Status = match.Status.ToString()
-            };
+            return _mapper.Map<MatchInfo>(match);
         }
     }
 }
