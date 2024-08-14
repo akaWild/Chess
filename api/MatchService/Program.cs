@@ -1,11 +1,19 @@
+using FluentValidation;
 using MatchService.Data;
-using MatchService.Features.GetCurrentMatch;
+using MatchService.Features;
+using MatchService.Features.CreateMatch;
 using MatchService.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using SharedLib.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddValidatorsFromAssemblyContaining(typeof(CreateMatchCommand));
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
