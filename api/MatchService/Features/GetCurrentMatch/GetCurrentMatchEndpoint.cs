@@ -1,7 +1,8 @@
-﻿using MediatR;
+﻿using MatchService.Features.GetCurrentMatch;
+using MediatR;
 using Microsoft.AspNetCore.SignalR;
 
-namespace MatchService.Features.GetCurrentMatch
+namespace MatchService.Features
 {
     public partial class MatchHub : Hub
     {
