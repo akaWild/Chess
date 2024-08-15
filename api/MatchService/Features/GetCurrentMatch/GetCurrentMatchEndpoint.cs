@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using MatchService.Exceptions;
-using MatchService.Features.GetCurrentMatch;
+﻿using MatchService.Features.GetCurrentMatch;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 
@@ -35,20 +33,9 @@ namespace MatchService.Features
             if (!Guid.TryParse(matchId, out var matchIdGuid))
                 throw new HubException("Match Id has incorrect format");
 
-            try
-            {
-                var result = await _sender.Send(new GetCurrentMatchQuery(matchIdGuid));
+            var result = await _sender.Send(new GetCurrentMatchQuery(matchIdGuid));
 
-                await Clients.Caller.SendAsync("LoadMatchInfo", result);
-            }
-            catch (Exception e) when (e.GetType() == typeof(BaseClientException) || e.GetType() == typeof(ValidationException))
-            {
-                await Clients.Caller.SendAsync("ClientError", e.Message);
-            }
-            catch (Exception e)
-            {
-                await Clients.Caller.SendAsync("ServerError", "Something went wrong");
-            }
+            await Clients.Caller.SendAsync("LoadMatchInfo", result);
         }
     }
 }
