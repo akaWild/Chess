@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MatchService.DTOs;
+using MatchService.Exceptions;
 using MatchService.Interfaces;
 using MatchService.Models;
 using SharedLib.CQRS;
@@ -62,7 +63,7 @@ namespace MatchService.Features.CreateMatch
         {
             var match = await _matchRepo.GetMatchById(request.CreateMatchDto.MatchId);
             if (match != null)
-                throw new Exception($"Match with id {request.CreateMatchDto.MatchId} already exists");
+                throw new DuplicateMatchException($"Match with id {request.CreateMatchDto.MatchId} already exists");
 
             //TODO Replace Creator with auth user
             match = new Match

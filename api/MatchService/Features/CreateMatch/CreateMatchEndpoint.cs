@@ -1,4 +1,6 @@
-﻿using MatchService.DTOs;
+﻿using FluentValidation;
+using MatchService.DTOs;
+using MatchService.Exceptions;
 using MatchService.Features.CreateMatch;
 using Microsoft.AspNetCore.SignalR;
 
@@ -16,9 +18,13 @@ namespace MatchService.Features
 
                 await Clients.Caller.SendAsync("MatchCreated", result);
             }
+            catch (Exception e) when (e.GetType() == typeof(BaseClientException) || e.GetType() == typeof(ValidationException))
+            {
+                await Clients.Caller.SendAsync("ClientError", e.Message);
+            }
             catch (Exception e)
             {
-                await Clients.Caller.SendAsync("Error", e.Message);
+                await Clients.Caller.SendAsync("ServerError", "Something went wrong");
             }
         }
     }
