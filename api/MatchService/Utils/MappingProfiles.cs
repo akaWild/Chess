@@ -11,6 +11,8 @@ namespace MatchService.Utils
             CreateMap<Match, MatchInfo>()
                 .ForMember(d => d.Fen, o => o.MapFrom(s => s.Board))
                 .ForMember(d => d.Pgn, o => o.ConvertUsing(new HistoryToPgnConverter(), s => s.History));
+
+            CreateMap<Match, MatchStartedDto>();
         }
     }
 }
