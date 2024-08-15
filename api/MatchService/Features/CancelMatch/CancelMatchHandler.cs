@@ -6,7 +6,7 @@ using SharedLib.CQRS;
 
 namespace MatchService.Features.CancelMatch
 {
-    public record CancelMatchCommand(Guid MatchId, string User)
+    public record CancelMatchCommand(Guid MatchId, string? User)
         : ICommand<Unit>;
 
     public class CancelMatchHandler : ICommandHandler<CancelMatchCommand, Unit>
@@ -20,6 +20,9 @@ namespace MatchService.Features.CancelMatch
 
         public async Task<Unit> Handle(CancelMatchCommand request, CancellationToken cancellationToken)
         {
+            if (request.User == null)
+                throw new UserNotAuthenticated("User is not authenticated");
+
             var match = await _matchRepo.GetMatchById(request.MatchId);
             if (match == null)
                 throw new MatchNotFoundException($"Match with id {request.MatchId} wasn't found");

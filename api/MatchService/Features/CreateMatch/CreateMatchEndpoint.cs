@@ -1,5 +1,4 @@
 ﻿using MatchService.DTOs;
-using MatchService.Exceptions;
 using MatchService.Features.CreateMatch;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -11,11 +10,7 @@ namespace MatchService.Features
         [Authorize]
         public async Task CreateMatch(CreateMatchDto createMatchDto)
         {
-            var username = Context.User?.Identity?.Name;
-            if (username == null)
-                throw new UserNotAuthenticated("User is not authenticated");
-
-            var result = await _sender.Send(new CreateMatchCommand(createMatchDto, username));
+            var result = await _sender.Send(new CreateMatchCommand(createMatchDto, Context.User?.Identity?.Name));
 
             await Groups.AddToGroupAsync(Context.ConnectionId, result.MatchId.ToString());
 

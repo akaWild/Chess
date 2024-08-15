@@ -7,7 +7,7 @@ using SharedLib.CQRS;
 
 namespace MatchService.Features.CreateMatch
 {
-    public record CreateMatchCommand(CreateMatchDto CreateMatchDto, string User)
+    public record CreateMatchCommand(CreateMatchDto CreateMatchDto, string? User)
         : ICommand<MatchCreatedDto>;
 
     public class CreateMatchValidator
@@ -61,6 +61,9 @@ namespace MatchService.Features.CreateMatch
 
         public async Task<MatchCreatedDto> Handle(CreateMatchCommand request, CancellationToken cancellationToken)
         {
+            if (request.User == null)
+                throw new UserNotAuthenticated("User is not authenticated");
+
             var match = await _matchRepo.GetMatchById(request.CreateMatchDto.MatchId);
             if (match != null)
                 throw new DuplicateMatchException($"Match with id {request.CreateMatchDto.MatchId} already exists");
