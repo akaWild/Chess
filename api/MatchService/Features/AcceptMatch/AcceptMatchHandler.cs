@@ -46,6 +46,8 @@ namespace MatchService.Features.AcceptMatch
 
                 match.WhiteSidePlayer = rndResult == 0 ? match.Creator : match.Acceptor;
             }
+            else
+                match.WhiteSidePlayer = match.WhiteSidePlayer == "0" ? match.Creator : match.Acceptor;
 
             match.ActingSide = MatchSide.White;
             match.Status = MatchStatus.InProgress;

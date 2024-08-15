@@ -9,9 +9,9 @@ namespace MatchService.Features
         [Authorize]
         public async Task AcceptMatch(Guid matchId)
         {
-            await _sender.Send(new AcceptMatchCommand(matchId, Context.User?.Identity?.Name));
+            var result = await _sender.Send(new AcceptMatchCommand(matchId, Context.User?.Identity?.Name));
 
-            await Clients.Group(matchId.ToString()).SendAsync("MatchStarted", matchId);
+            await Clients.Group(matchId.ToString()).SendAsync("MatchStarted", result);
         }
     }
 }
