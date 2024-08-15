@@ -71,6 +71,10 @@ namespace MatchService.Features.CreateMatch
             match = new Match
             {
                 MatchId = request.CreateMatchDto.MatchId,
+                AILevel = request.CreateMatchDto.AILevel,
+                TimeLimit = request.CreateMatchDto.TimeLimit,
+                ExtraTimePerMove = request.CreateMatchDto.ExtraTimePerMove,
+                WhiteSidePlayer = request.CreateMatchDto.FirstToActSide?.ToString(),
                 Creator = request.User
             };
 
