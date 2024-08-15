@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MatchService.DTOs;
+using MatchService.Exceptions;
 using MatchService.Interfaces;
 using SharedLib.CQRS;
 
@@ -22,7 +23,7 @@ namespace MatchService.Features.GetCurrentMatch
         {
             var match = await _matchRepo.GetMatchById(request.MatchId);
             if (match == null)
-                throw new Exception($"Match with id {request.MatchId} wasn't found");
+                throw new MatchNotFoundException($"Match with id {request.MatchId} wasn't found");
 
             return _mapper.Map<MatchInfo>(match);
         }

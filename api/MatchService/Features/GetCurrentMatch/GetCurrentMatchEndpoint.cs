@@ -1,4 +1,6 @@
-﻿using MatchService.Features.GetCurrentMatch;
+﻿using FluentValidation;
+using MatchService.Exceptions;
+using MatchService.Features.GetCurrentMatch;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 
@@ -39,9 +41,13 @@ namespace MatchService.Features
 
                 await Clients.Caller.SendAsync("LoadMatchInfo", result);
             }
+            catch (Exception e) when (e.GetType() == typeof(BaseClientException) || e.GetType() == typeof(ValidationException))
+            {
+                await Clients.Caller.SendAsync("ClientError", e.Message);
+            }
             catch (Exception e)
             {
-                throw new HubException(e.Message);
+                await Clients.Caller.SendAsync("ServerError", "Something went wrong");
             }
         }
     }
