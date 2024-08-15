@@ -7,7 +7,7 @@ using SharedLib.CQRS;
 
 namespace MatchService.Features.CreateMatch
 {
-    public record CreateMatchCommand(CreateMatchDto CreateMatchDto)
+    public record CreateMatchCommand(CreateMatchDto CreateMatchDto, string User)
         : ICommand<MatchCreatedDto>;
 
     public class CreateMatchValidator
@@ -65,11 +65,10 @@ namespace MatchService.Features.CreateMatch
             if (match != null)
                 throw new DuplicateMatchException($"Match with id {request.CreateMatchDto.MatchId} already exists");
 
-            //TODO Replace Creator with auth user
             match = new Match
             {
                 MatchId = request.CreateMatchDto.MatchId,
-                Creator = "Tolian"
+                Creator = request.User
             };
 
             _matchRepo.AddMatch(match);
