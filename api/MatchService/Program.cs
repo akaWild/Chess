@@ -1,5 +1,6 @@
 using FluentValidation;
 using MatchService.Data;
+using MatchService.Extensions;
 using MatchService.Features;
 using MatchService.Features.CreateMatch;
 using MatchService.Interfaces;
@@ -24,12 +25,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSignalR().AddHubOptions<MatchHub>(options =>
 {
     options.AddFilter<MatchHubCustomFilter>();
-}); ;
+});
+builder.Services.AddAuthServices(builder.Configuration);
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 
 var app = builder.Build();
 
-app.MapHub<MatchHub>("matches");
+app.MapHub<MatchHub>("/matches");
 
 DbInitializer.InitDb(app);
 
