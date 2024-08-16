@@ -32,10 +32,10 @@ namespace MatchService.Features.AcceptMatch
                 throw new MatchNotFoundException($"Match with id {request.MatchId} wasn't found");
 
             if (match.Status != MatchStatus.Created)
-                throw new MatchCancellationException("Only not started match can be accepted");
+                throw new MatchAcceptanceException("Only not started match can be accepted");
 
             if (request.User == match.Creator)
-                throw new MatchCancellationException("Match can't be accepted by match creator");
+                throw new MatchAcceptanceException("Match can't be accepted by match creator");
 
             match.Acceptor = request.User;
             match.StartedAtUtc = DateTime.UtcNow;
