@@ -1,5 +1,6 @@
 using AutoFixture;
 using MatchService.DTOs;
+using MatchService.Exceptions;
 using MatchService.Features;
 using MatchService.Features.AcceptMatch;
 using MatchService.Features.CancelMatch;
@@ -101,7 +102,7 @@ namespace MatchService.UnitTests
             //Act
 
             //Assert
-            await Assert.ThrowsAsync<HubException>(() => hub.OnConnectedAsync());
+            await Assert.ThrowsAsync<MatchIdFormatException>(() => hub.OnConnectedAsync());
         }
 
         [Fact]
