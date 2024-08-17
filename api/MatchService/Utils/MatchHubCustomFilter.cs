@@ -14,7 +14,7 @@ namespace MatchService.Utils
             }
             catch (Exception e) when (e is BaseClientException or ValidationException)
             {
-                await invocationContext.Hub.Clients.Caller.SendAsync("ClientError", e.Message);
+                await invocationContext.Hub.Clients.Caller.SendAsync("ClientError", e.Message, e.GetType());
 
                 throw;
             }
@@ -23,6 +23,26 @@ namespace MatchService.Utils
                 await invocationContext.Hub.Clients.Caller.SendAsync("ServerError", "Something went wrong");
 
                 throw;
+            }
+        }
+
+        public async Task OnConnectedAsync(HubLifetimeContext context, Func<HubLifetimeContext, Task> next)
+        {
+            try
+            {
+                await next(context);
+            }
+            catch (Exception e) when (e is BaseClientException or ValidationException)
+            {
+                await context.Hub.Clients.Caller.SendAsync("ClientError", e.Message, e.GetType().Name);
+
+                throw new HubException(e.Message);
+            }
+            catch (Exception e)
+            {
+                await context.Hub.Clients.Caller.SendAsync("ServerError", "Something went wrong");
+
+                throw new HubException("Something went wrong");
             }
         }
     }
