@@ -1,40 +1,30 @@
 ﻿using AutoFixture;
-using MatchService.Data;
 using MatchService.DTOs;
 using MatchService.IntegrationTests.Fixtures;
 using MatchService.IntegrationTests.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Security.Claims;
 
 namespace MatchService.IntegrationTests
 {
     [Collection("Shared collection")]
-    public class CreateMatchEndpointTests : IAsyncLifetime
+    public class CreateMatchEndpointTests : EndpointTestsBase
     {
         private readonly string? _tokenWithoutUser;
         private readonly string? _validToken;
-        private readonly CustomWebAppFactory _factory;
-        private readonly HttpMessageHandler _httpMessageHandler;
         private readonly Fixture _fixture;
 
-        private bool _responseReceived = false;
         private MatchCreatedDto? _matchCreatedDto;
         private MatchStartedDto? _matchStartedDto;
-        private string? _clientErrorMessage;
-        private string? _serverErrorMessage;
 
-        public CreateMatchEndpointTests(CustomWebAppFactory factory)
+        public CreateMatchEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
-            _factory = factory;
-            _httpMessageHandler = _factory.Server.CreateHandler();
-
             _fixture = new Fixture();
 
-            var clientWithoutUser = _factory.CreateClient();
-            var validClient = _factory.CreateClient();
+            var clientWithoutUser = Factory.CreateClient();
+            var validClient = Factory.CreateClient();
 
             var emptyClaims = new Dictionary<string, object>() { };
             var validClaims = new Dictionary<string, object>()
@@ -53,7 +43,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithoutToken()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler);
 
             SetConnectionHandlers(hubConnection);
 
@@ -71,7 +61,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithNullRequestDto()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -89,7 +79,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithDefaultMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -112,7 +102,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidAILevel(int aiLevel)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -135,7 +125,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidAISettings(bool? vsBot, int? aiLevel)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -160,7 +150,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidTimeLimit(int timeLimit)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -186,7 +176,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidExtraTime(int extraTime)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -211,7 +201,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidTimeSettings()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -238,7 +228,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidFirstSideToAct(int firstSideToAct)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -264,7 +254,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithoutUser()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -290,7 +280,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithExistentMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _validToken);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _validToken);
 
             SetConnectionHandlers(hubConnection);
 
@@ -317,7 +307,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithValidInputVsHuman()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _validToken);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _validToken);
 
             SetConnectionHandlers(hubConnection);
 
@@ -347,7 +337,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithValidInputVsBot()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, token: _validToken);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _validToken);
 
             SetConnectionHandlers(hubConnection);
 
@@ -373,62 +363,30 @@ namespace MatchService.IntegrationTests
             Assert.NotNull(_matchStartedDto);
         }
 
-        public Task InitializeAsync() => Task.CompletedTask;
-
-        public Task DisposeAsync()
+        public override Task DisposeAsync()
         {
-            _responseReceived = false;
-            _matchCreatedDto = default;
-            _clientErrorMessage = null;
-            _serverErrorMessage = null;
+            _matchCreatedDto = null;
+            _matchStartedDto = null;
 
-            using var scope = _factory.Services.CreateScope();
-
-            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-            DbHelper.ReinitDbForTests(db);
-
-            return Task.CompletedTask;
+            return base.DisposeAsync();
         }
 
-        private void SetConnectionHandlers(HubConnection hubConnection)
+        protected override void SetConnectionHandlers(HubConnection hubConnection)
         {
+            base.SetConnectionHandlers(hubConnection);
+
             hubConnection.On<MatchCreatedDto>("MatchCreated", (mi) =>
             {
                 _matchCreatedDto = mi;
 
-                _responseReceived = true;
+                ResponseReceived = true;
             });
             hubConnection.On<MatchStartedDto>("MatchStarted", (mi) =>
             {
                 _matchStartedDto = mi;
 
-                _responseReceived = true;
+                ResponseReceived = true;
             });
-            hubConnection.On<string, string>("ClientError", (errMsg, _) =>
-            {
-                _clientErrorMessage = errMsg;
-
-                _responseReceived = true;
-            });
-            hubConnection.On<string>("ServerError", (errMsg) =>
-            {
-                _serverErrorMessage = errMsg;
-
-                _responseReceived = true;
-            });
-        }
-
-        private Task WaitForResponse(int timeout)
-        {
-            var startTime = DateTime.Now;
-            while (!_responseReceived)
-            {
-                if (DateTime.Now - startTime > TimeSpan.FromMilliseconds(timeout))
-                    break;
-            }
-
-            return Task.CompletedTask;
         }
     }
 }
