@@ -15,6 +15,8 @@ namespace MatchService.Features.CreateMatch
     {
         public CreateMatchValidator()
         {
+            ClassLevelCascadeMode = CascadeMode.Stop;
+
             RuleFor(x => x.CreateMatchDto).NotNull().WithMessage("Match data object can't be null");
             RuleFor(x => x.CreateMatchDto.MatchId).NotEmpty().WithMessage("Match id must be provided");
             RuleFor(p => p.CreateMatchDto.AILevel).InclusiveBetween(1, 25).WithMessage("AI level must be in the range [1,25]");
