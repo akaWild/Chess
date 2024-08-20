@@ -14,15 +14,15 @@ namespace MatchService.Utils
             }
             catch (Exception e) when (e is BaseClientException or ValidationException)
             {
-                await invocationContext.Hub.Clients.Caller.SendAsync("ClientError", e.Message, e.GetType());
+                await invocationContext.Hub.Clients.Caller.SendAsync("ClientError", e.Message, e.GetType().Name);
 
-                throw;
+                throw new HubException(e.Message);
             }
             catch (Exception e)
             {
                 await invocationContext.Hub.Clients.Caller.SendAsync("ServerError", "Something went wrong");
 
-                throw;
+                throw new HubException("Something went wrong");
             }
         }
 
