@@ -31,10 +31,10 @@ namespace MatchService.IntegrationTests
             var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler);
 
             SetConnectionHandlers(hubConnection);
-            await WaitForResponse(1000);
 
             //Act
             await hubConnection.StartAsync();
+            await WaitForResponse(1000);
 
             //Assert
             Assert.Null(_clientErrorMessage);
@@ -46,7 +46,7 @@ namespace MatchService.IntegrationTests
         public async Task GetCurrentMatch_WithIncorrectMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, "12345-6789");
+            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, matchId: "12345-6789");
 
             SetConnectionHandlers(hubConnection);
 
@@ -65,7 +65,7 @@ namespace MatchService.IntegrationTests
         public async Task GetCurrentMatch_WithNotExistentMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, "38B56259-CCCC-4821-AA4F-D83ED7B58FDF");
+            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, matchId: "38B56259-CCCC-4821-AA4F-D83ED7B58FDF");
 
             SetConnectionHandlers(hubConnection);
 
@@ -84,7 +84,7 @@ namespace MatchService.IntegrationTests
         public async Task GetCurrentMatch_WithExistentMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, "38B56259-55C0-4821-AA4F-D83ED7B58FDF");
+            var hubConnection = HubConnectionHelper.GetHubConnection(_httpMessageHandler, matchId: "38B56259-55C0-4821-AA4F-D83ED7B58FDF");
 
             SetConnectionHandlers(hubConnection);
 

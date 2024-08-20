@@ -4,10 +4,18 @@ namespace MatchService.IntegrationTests.Utils
 {
     public static class HubConnectionHelper
     {
-        public static HubConnection GetHubConnection(HttpMessageHandler handler, string? matchId = null)
+        public static HubConnection GetHubConnection(HttpMessageHandler handler, string? token = null, string? matchId = null)
         {
+            var url = $"http://localhost/{SharedData.HubEndpoint}";
+
+            if (token != null)
+                url += $"?access_token={token}";
+
+            if (matchId != null)
+                url += (token == null ? "?" : "&") + $"matchId={matchId}";
+
             var hubConnection = new HubConnectionBuilder()
-                .WithUrl($"http://localhost/{SharedData.HubEndpoint}" + (matchId == null ? "" : $"?matchId={matchId}"), o =>
+                .WithUrl(url, o =>
                 {
                     o.HttpMessageHandlerFactory = _ => handler;
                 })
