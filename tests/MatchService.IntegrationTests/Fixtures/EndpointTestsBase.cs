@@ -1,4 +1,5 @@
-﻿using MatchService.Data;
+﻿using AutoFixture;
+using MatchService.Data;
 using MatchService.IntegrationTests.Utils;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ namespace MatchService.IntegrationTests.Fixtures
 {
     public class EndpointTestsBase : IAsyncLifetime
     {
+        protected readonly Fixture Fixture;
         protected readonly CustomWebAppFactory Factory;
         protected readonly HttpMessageHandler HttpMessageHandler;
 
@@ -16,6 +18,8 @@ namespace MatchService.IntegrationTests.Fixtures
 
         public EndpointTestsBase(CustomWebAppFactory factory)
         {
+            Fixture = new Fixture();
+
             Factory = factory;
             HttpMessageHandler = Factory.Server.CreateHandler();
         }

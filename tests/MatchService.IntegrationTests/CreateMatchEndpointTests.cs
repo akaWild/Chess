@@ -12,15 +12,12 @@ namespace MatchService.IntegrationTests
     {
         private readonly string? _tokenWithoutUser;
         private readonly string? _validToken;
-        private readonly Fixture _fixture;
 
         private MatchCreatedDto? _matchCreatedDto;
         private MatchStartedDto? _matchStartedDto;
 
         public CreateMatchEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
-            _fixture = new Fixture();
-
             _tokenWithoutUser = TokenHelper.GetAccessToken(factory);
             _validToken = TokenHelper.GetAccessToken(factory, "Tolian");
         }
@@ -36,7 +33,7 @@ namespace MatchService.IntegrationTests
             //Act
             await hubConnection.StartAsync();
 
-            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CreateMatch", _fixture.Create<CreateMatchDto>()));
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CreateMatch", Fixture.Create<CreateMatchDto>()));
 
             //Assert
             Assert.NotNull(exception);
@@ -69,7 +66,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>().Without(p => p.MatchId).Create();
+            var createMatchDto = Fixture.Build<CreateMatchDto>().Without(p => p.MatchId).Create();
 
             //Act
             await hubConnection.StartAsync();
@@ -92,7 +89,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>().With(p => p.AILevel, aiLevel).Create();
+            var createMatchDto = Fixture.Build<CreateMatchDto>().With(p => p.AILevel, aiLevel).Create();
 
             //Act
             await hubConnection.StartAsync();
@@ -115,7 +112,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, vsBot)
                 .With(p => p.AILevel, aiLevel)
                 .Create();
@@ -140,7 +137,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, true)
                 .With(p => p.AILevel, 10)
                 .With(p => p.TimeLimit, timeLimit)
@@ -166,7 +163,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, true)
                 .With(p => p.AILevel, 10)
                 .With(p => p.TimeLimit, 5000)
@@ -191,7 +188,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, true)
                 .With(p => p.AILevel, 10)
                 .With(p => p.TimeLimit, (int?)null)
@@ -218,7 +215,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, true)
                 .With(p => p.AILevel, 10)
                 .With(p => p.TimeLimit, 5000)
@@ -244,7 +241,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, true)
                 .With(p => p.AILevel, 10)
                 .With(p => p.TimeLimit, 5000)
@@ -270,7 +267,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.MatchId, Guid.Parse("7139D633-66F9-439F-8198-E5E18E9F6848"))
                 .With(p => p.VsBot, true)
                 .With(p => p.AILevel, 10)
@@ -297,7 +294,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, false)
                 .With(p => p.AILevel, (int?)null)
                 .With(p => p.TimeLimit, 5000)
@@ -327,7 +324,7 @@ namespace MatchService.IntegrationTests
 
             SetConnectionHandlers(hubConnection);
 
-            var createMatchDto = _fixture.Build<CreateMatchDto>()
+            var createMatchDto = Fixture.Build<CreateMatchDto>()
                 .With(p => p.VsBot, true)
                 .With(p => p.AILevel, 5)
                 .With(p => p.TimeLimit, 800)
