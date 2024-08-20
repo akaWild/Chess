@@ -4,8 +4,6 @@ using MatchService.IntegrationTests.Fixtures;
 using MatchService.IntegrationTests.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using System.Net;
-using System.Security.Claims;
 
 namespace MatchService.IntegrationTests
 {
@@ -23,20 +21,8 @@ namespace MatchService.IntegrationTests
         {
             _fixture = new Fixture();
 
-            var clientWithoutUser = Factory.CreateClient();
-            var validClient = Factory.CreateClient();
-
-            var emptyClaims = new Dictionary<string, object>() { };
-            var validClaims = new Dictionary<string, object>()
-            {
-                { ClaimTypes.Name, "Tolian" }
-            };
-
-            clientWithoutUser.SetFakeJwtBearerToken(emptyClaims);
-            validClient.SetFakeJwtBearerToken(validClaims);
-
-            _tokenWithoutUser = clientWithoutUser.DefaultRequestHeaders.Authorization?.Parameter;
-            _validToken = validClient.DefaultRequestHeaders.Authorization?.Parameter;
+            _tokenWithoutUser = TokenHelper.GetAccessToken(factory);
+            _validToken = TokenHelper.GetAccessToken(factory, "Tolian");
         }
 
         [Fact]
