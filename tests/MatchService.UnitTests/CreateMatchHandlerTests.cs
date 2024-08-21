@@ -1,4 +1,6 @@
 ﻿using AutoFixture;
+using AutoMapper;
+using MassTransit;
 using MatchService.DTOs;
 using MatchService.Exceptions;
 using MatchService.Features.CreateMatch;
@@ -11,11 +13,15 @@ namespace MatchService.UnitTests
     public class CreateMatchHandlerTests
     {
         private readonly Mock<IMatchRepository> _matchRepositoryMock;
+        private readonly Mock<IPublishEndpoint> _publishEndpoint;
+        private readonly Mock<IMapper> _mapperMock;
         private readonly Fixture _fixture;
 
         public CreateMatchHandlerTests()
         {
             _matchRepositoryMock = new Mock<IMatchRepository>();
+            _publishEndpoint = new Mock<IPublishEndpoint>();
+            _mapperMock = new Mock<IMapper>();
 
             _fixture = new Fixture();
             var customization = new SupportMutableValueTypesCustomization();
@@ -26,7 +32,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNoUser_ThrowsUserNotAuthenticated()
         {
             //Arrange
-            var sut = new CreateMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CreateMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var matchCommand = new CreateMatchCommand(It.IsAny<CreateMatchDto>(), null);
 
             //Act
@@ -39,7 +45,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNotNullMatch_ThrowsDuplicateMatchException()
         {
             //Arrange
-            var sut = new CreateMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CreateMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var createMatchDto = _fixture.Create<CreateMatchDto>();
             var matchCommand = new CreateMatchCommand(createMatchDto, _fixture.Create<string>());
             var match = _fixture.Create<Match>();
@@ -56,7 +62,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNullMatch_ShouldReturnCorrectDto()
         {
             //Arrange
-            var sut = new CreateMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CreateMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var createMatchDto = _fixture.Create<CreateMatchDto>();
             var matchCommand = new CreateMatchCommand(createMatchDto, _fixture.Create<string>());
             Match? match = null;

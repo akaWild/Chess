@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using MassTransit;
 using MatchService.Exceptions;
 using MatchService.Features.CancelMatch;
 using MatchService.Interfaces;
@@ -12,11 +13,13 @@ namespace MatchService.UnitTests
     public class CancelMatchHandlerTests
     {
         private readonly Mock<IMatchRepository> _matchRepositoryMock;
+        private readonly Mock<IPublishEndpoint> _publishEndpoint;
         private readonly Fixture _fixture;
 
         public CancelMatchHandlerTests()
         {
             _matchRepositoryMock = new Mock<IMatchRepository>();
+            _publishEndpoint = new Mock<IPublishEndpoint>();
 
             _fixture = new Fixture();
             var customization = new SupportMutableValueTypesCustomization();
@@ -27,7 +30,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNoUser_ThrowsUserNotAuthenticated()
         {
             //Arrange
-            var sut = new CancelMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CancelMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object);
             var matchCommand = new CancelMatchCommand(It.IsAny<Guid>(), null);
 
             //Act
@@ -40,7 +43,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNotFoundMatch_ThrowsMatchNotFoundException()
         {
             //Arrange
-            var sut = new CancelMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CancelMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object);
             var matchCommand = new CancelMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
 
             _matchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync((Match?)null);
@@ -55,7 +58,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNotCreatedMatchStatus_ThrowsMatchCancellationException()
         {
             //Arrange
-            var sut = new CancelMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CancelMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object);
             var matchCommand = new CancelMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
             var matchStatus = _fixture.Create<Generator<MatchStatus>>().First(s => s != MatchStatus.Created);
             var match = _fixture.Build<Match>().With(x => x.Status, matchStatus).Create();
@@ -72,7 +75,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithUserNotEqualToMatchCreator_ThrowsMatchCancellationException()
         {
             //Arrange
-            var sut = new CancelMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CancelMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object);
             var matchCommand = new CancelMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
             var match = _fixture.Build<Match>().With(x => x.Status, MatchStatus.Created).Create();
 
@@ -88,7 +91,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithValidInput_ThrowsNoExceptions()
         {
             //Arrange
-            var sut = new CancelMatchHandler(_matchRepositoryMock.Object);
+            var sut = new CancelMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object);
             var matchCommand = new CancelMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
             var match = _fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.Created)

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using ChessDotNet.Public;
+using EventsLib;
+using MassTransit;
 using MatchService.DTOs;
 using MatchService.Exceptions;
 using MatchService.Interfaces;
@@ -14,11 +16,13 @@ namespace MatchService.Features.AcceptMatch
     public class AcceptMatchHandler : ICommandHandler<AcceptMatchCommand, MatchStartedDto>
     {
         private readonly IMatchRepository _matchRepo;
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly IMapper _mapper;
 
-        public AcceptMatchHandler(IMatchRepository matchRepo, IMapper mapper)
+        public AcceptMatchHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint, IMapper mapper)
         {
             _matchRepo = matchRepo;
+            _publishEndpoint = publishEndpoint;
             _mapper = mapper;
         }
 
@@ -60,6 +64,8 @@ namespace MatchService.Features.AcceptMatch
             }
 
             await _matchRepo.SaveChangesAsync();
+
+            await _publishEndpoint.Publish(_mapper.Map<MatchStarted>(match), cancellationToken);
 
             return _mapper.Map<MatchStartedDto>(match);
         }

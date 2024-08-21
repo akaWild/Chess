@@ -1,4 +1,6 @@
-﻿using MatchService.Exceptions;
+﻿using EventsLib;
+using MassTransit;
+using MatchService.Exceptions;
 using MatchService.Interfaces;
 using MatchService.Models;
 using MediatR;
@@ -12,10 +14,12 @@ namespace MatchService.Features.CancelMatch
     public class CancelMatchHandler : ICommandHandler<CancelMatchCommand, Unit>
     {
         private readonly IMatchRepository _matchRepo;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public CancelMatchHandler(IMatchRepository matchRepo)
+        public CancelMatchHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint)
         {
             _matchRepo = matchRepo;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<Unit> Handle(CancelMatchCommand request, CancellationToken cancellationToken)
@@ -35,6 +39,8 @@ namespace MatchService.Features.CancelMatch
 
             _matchRepo.RemoveMatch(match);
             await _matchRepo.SaveChangesAsync();
+
+            await _publishEndpoint.Publish(new MatchCancelled(request.MatchId), cancellationToken);
 
             return Unit.Value;
         }

@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using AutoMapper;
 using ChessDotNet.Public;
+using MassTransit;
 using MatchService.DTOs;
 using MatchService.Exceptions;
 using MatchService.Features.AcceptMatch;
@@ -14,12 +15,14 @@ namespace MatchService.UnitTests
     public class AcceptMatchHandlerTests
     {
         private readonly Mock<IMatchRepository> _matchRepositoryMock;
+        private readonly Mock<IPublishEndpoint> _publishEndpoint;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Fixture _fixture;
 
         public AcceptMatchHandlerTests()
         {
             _matchRepositoryMock = new Mock<IMatchRepository>();
+            _publishEndpoint = new Mock<IPublishEndpoint>();
             _mapperMock = new Mock<IMapper>();
 
             _fixture = new Fixture();
@@ -31,7 +34,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNoUser_ThrowsUserNotAuthenticated()
         {
             //Arrange
-            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _mapperMock.Object);
+            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var matchCommand = new AcceptMatchCommand(It.IsAny<Guid>(), null);
 
             //Act
@@ -44,7 +47,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNullMatch_ThrowsMatchNotFoundException()
         {
             //Arrange
-            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _mapperMock.Object);
+            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var matchCommand = new AcceptMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
 
             _matchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync((Match?)null);
@@ -59,7 +62,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNotCreatedMatchStatus_ThrowsMatchMatchAcceptanceException()
         {
             //Arrange
-            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _mapperMock.Object);
+            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var matchCommand = new AcceptMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
             var matchStatus = _fixture.Create<Generator<MatchStatus>>().First(s => s != MatchStatus.Created);
             var match = _fixture.Build<Match>().With(x => x.Status, matchStatus).Create();
@@ -76,7 +79,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithIsMatchCreator_ThrowsMatchMatchAcceptanceException()
         {
             //Arrange
-            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _mapperMock.Object);
+            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var matchCommand = new AcceptMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
             var match = _fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.Created)
@@ -95,7 +98,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithIsMatchCreator_ShouldReturnCorrectDto()
         {
             //Arrange
-            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _mapperMock.Object);
+            var sut = new AcceptMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object, _mapperMock.Object);
             var matchCommand = new AcceptMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
 
             string? whiteSidePlayer = null;

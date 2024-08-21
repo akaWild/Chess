@@ -1,4 +1,7 @@
-﻿using FluentValidation;
+﻿using AutoMapper;
+using EventsLib;
+using FluentValidation;
+using MassTransit;
 using MatchService.DTOs;
 using MatchService.Exceptions;
 using MatchService.Interfaces;
@@ -55,10 +58,14 @@ namespace MatchService.Features.CreateMatch
     public class CreateMatchHandler : ICommandHandler<CreateMatchCommand, MatchCreatedDto>
     {
         private readonly IMatchRepository _matchRepo;
+        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IMapper _mapper;
 
-        public CreateMatchHandler(IMatchRepository matchRepo)
+        public CreateMatchHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint, IMapper mapper)
         {
             _matchRepo = matchRepo;
+            _publishEndpoint = publishEndpoint;
+            _mapper = mapper;
         }
 
         public async Task<MatchCreatedDto> Handle(CreateMatchCommand request, CancellationToken cancellationToken)
@@ -82,6 +89,8 @@ namespace MatchService.Features.CreateMatch
 
             _matchRepo.AddMatch(match);
             await _matchRepo.SaveChangesAsync();
+
+            await _publishEndpoint.Publish(_mapper.Map<MatchCreated>(match), cancellationToken);
 
             var matchCreatedDto = new MatchCreatedDto
             {
