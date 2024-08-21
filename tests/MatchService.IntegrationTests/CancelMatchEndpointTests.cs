@@ -12,6 +12,8 @@ namespace MatchService.IntegrationTests
         private readonly string? _tolianToken;
         private readonly string? _kolianToken;
 
+        private Guid _matchId;
+
         public CancelMatchEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
             _tokenWithoutUser = TokenHelper.GetAccessToken(factory);
@@ -23,14 +25,15 @@ namespace MatchService.IntegrationTests
         public async Task CancelMatch_WithoutToken()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler);
+            var matchId = Guid.Parse("7139D633-66F9-439F-8198-E5E18E9F6848");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
             //Act
             await hubConnection.StartAsync();
 
-            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", Fixture.Create<Guid>()));
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
             //Assert
             Assert.NotNull(exception);
@@ -41,14 +44,15 @@ namespace MatchService.IntegrationTests
         public async Task CancelMatch_WithoutUser()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var matchId = Guid.Parse("7139D633-66F9-439F-8198-E5E18E9F6848");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
             //Act
             await hubConnection.StartAsync();
 
-            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", Fixture.Create<Guid>()));
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
             //Assert
             Assert.NotNull(exception);
@@ -59,14 +63,15 @@ namespace MatchService.IntegrationTests
         public async Task CancelMatch_WithUnknownMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken);
+            var matchId = Fixture.Create<Guid>();
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
             //Act
             await hubConnection.StartAsync();
 
-            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", Fixture.Create<Guid>()));
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
             //Assert
             Assert.NotNull(exception);
@@ -77,14 +82,15 @@ namespace MatchService.IntegrationTests
         public async Task CancelMatch_WithInvalidMatchStatus()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken);
+            var matchId = Guid.Parse("38B56259-55C0-4821-AA4F-D83ED7B58FDF");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
             //Act
             await hubConnection.StartAsync();
 
-            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", "38B56259-55C0-4821-AA4F-D83ED7B58FDF"));
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
             //Assert
             Assert.NotNull(exception);
@@ -95,14 +101,15 @@ namespace MatchService.IntegrationTests
         public async Task CancelMatch_WithInvalidMatchCreator()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken);
+            var matchId = Guid.Parse("7139D633-66F9-439F-8198-E5E18E9F6848");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
             //Act
             await hubConnection.StartAsync();
 
-            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", "7139D633-66F9-439F-8198-E5E18E9F6848"));
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
             //Assert
             Assert.NotNull(exception);
@@ -113,17 +120,38 @@ namespace MatchService.IntegrationTests
         public async Task CancelMatch_WithValidInputData()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken);
+            var matchId = Guid.Parse("7139D633-66F9-439F-8198-E5E18E9F6848");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
             //Act
             await hubConnection.StartAsync();
 
-            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", "7139D633-66F9-439F-8198-E5E18E9F6848"));
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
             //Assert
             Assert.Null(exception);
+            Assert.Equal(matchId, _matchId);
+        }
+
+        public override Task DisposeAsync()
+        {
+            _matchId = default;
+
+            return base.DisposeAsync();
+        }
+
+        protected override void SetConnectionHandlers(HubConnection hubConnection)
+        {
+            base.SetConnectionHandlers(hubConnection);
+
+            hubConnection.On<Guid>("MatchCancelled", (matchId) =>
+            {
+                _matchId = matchId;
+
+                ResponseReceived = true;
+            });
         }
     }
 }
