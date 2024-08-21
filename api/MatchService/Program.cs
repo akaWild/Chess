@@ -1,4 +1,5 @@
 using FluentValidation;
+using MassTransit;
 using MatchService.Data;
 using MatchService.Extensions;
 using MatchService.Features;
@@ -20,6 +21,19 @@ builder.Services.AddMediatR(config =>
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.AddMassTransit(x =>
+{
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("match", false));
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host =>
+        {
+            host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest")!);
+            host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest")!);
+        });
+        cfg.ConfigureEndpoints(context);
+    });
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSignalR().AddHubOptions<MatchHub>(options =>

@@ -33,6 +33,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;Database=matches;User Id=postgres;Password=postgrespass
+      - RabbitMq__Host=rabbitmq
       - TokenKey=MEgCQQCPbDhohZXk+x+qmz7M49VenP4YsAmNdkNeHlLaeKY3oXRZxmVHePw006+U54VubXfshn7izM4mujXE48x9py/zAgMBAAE=
     ports:
       - 6000:8080
