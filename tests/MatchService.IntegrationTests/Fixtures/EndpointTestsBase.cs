@@ -24,19 +24,22 @@ namespace MatchService.IntegrationTests.Fixtures
             HttpMessageHandler = Factory.Server.CreateHandler();
         }
 
-        public virtual Task InitializeAsync() => Task.CompletedTask;
+        public virtual Task InitializeAsync()
+        {
+            using var scope = Factory.Services.CreateScope();
+
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+            DbHelper.ReinitDbForTests(db);
+
+            return Task.CompletedTask;
+        }
 
         public virtual Task DisposeAsync()
         {
             ResponseReceived = false;
             ClientErrorMessage = null;
             ServerErrorMessage = null;
-
-            using var scope = Factory.Services.CreateScope();
-
-            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-            DbHelper.ReinitDbForTests(db);
 
             return Task.CompletedTask;
         }
