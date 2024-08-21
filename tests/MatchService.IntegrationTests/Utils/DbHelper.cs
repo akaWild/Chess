@@ -30,6 +30,18 @@ namespace MatchService.IntegrationTests.Utils
                 },
                 new Match
                 {
+                    MatchId = Guid.Parse("34730E34-4D6E-463D-A9BA-8EC26BEBB63F"),
+                    Creator = "Tolian",
+                    WhiteSidePlayer = "0"
+                },
+                new Match
+                {
+                    MatchId = Guid.Parse("03010934-839C-4DF9-BA11-643EC0FB120C"),
+                    Creator = "Tolian",
+                    WhiteSidePlayer = "1"
+                },
+                new Match
+                {
                     MatchId = Guid.Parse("38B56259-55C0-4821-AA4F-D83ED7B58FDF"),
                     Creator = "Tolian",
                     StartedAtUtc = DateTime.UtcNow,
