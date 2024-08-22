@@ -24,6 +24,13 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 builder.Services.AddMassTransit(x =>
 {
+    x.AddEntityFrameworkOutbox<DataContext>(o =>
+    {
+        o.QueryDelay = TimeSpan.FromSeconds(10);
+
+        o.UsePostgres();
+        o.UseBusOutbox();
+    });
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("match", false));
     x.UsingRabbitMq((context, cfg) =>
     {

@@ -1,4 +1,5 @@
-﻿using MatchService.Models;
+﻿using MassTransit;
+using MatchService.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace MatchService.Data
@@ -10,5 +11,14 @@ namespace MatchService.Data
         }
 
         public required DbSet<Match> Matches { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
+        }
     }
 }
