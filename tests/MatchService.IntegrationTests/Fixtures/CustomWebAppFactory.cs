@@ -1,4 +1,5 @@
-﻿using MatchService.Data;
+﻿using MassTransit;
+using MatchService.Data;
 using MatchService.IntegrationTests.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +33,10 @@ namespace MatchService.IntegrationTests.Fixtures
                 services.AddDbContext<DataContext>(options =>
                 {
                     options.UseNpgsql(_postgreSqlContainer.GetConnectionString());
+                });
+                services.AddMassTransitTestHarness(opt =>
+                {
+                    opt.SetTestTimeouts(TimeSpan.FromSeconds(10));
                 });
                 services.EnsureCreated<DataContext>();
                 services.AddAuthentication(FakeJwtBearerDefaults.AuthenticationScheme).AddFakeJwtBearer(opt =>

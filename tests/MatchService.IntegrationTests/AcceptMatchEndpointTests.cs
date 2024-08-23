@@ -1,4 +1,7 @@
 ﻿using AutoFixture;
+using EventsLib;
+using MassTransit.Internals;
+using MassTransit.Testing;
 using MatchService.DTOs;
 using MatchService.IntegrationTests.Fixtures;
 using MatchService.IntegrationTests.Utils;
@@ -131,6 +134,8 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("AcceptMatch", matchId));
 
+            await WaitForResponse(5000);
+
             //Assert
             Assert.Null(exception);
             Assert.NotNull(_matchStartedDto);
@@ -138,6 +143,7 @@ namespace MatchService.IntegrationTests
             Assert.InRange(_matchStartedDto.StartedAtUtc, DateTime.UtcNow - TimeSpan.FromMilliseconds(1000), DateTime.UtcNow);
             Assert.Equal("Kolian", _matchStartedDto.Acceptor);
             Assert.Equal("Tolian", _matchStartedDto.WhiteSidePlayer);
+            Assert.NotNull((await Harness.Published.SelectAsync<MatchStarted>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
         }
 
         [Fact]
@@ -154,6 +160,8 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("AcceptMatch", matchId));
 
+            await WaitForResponse(5000);
+
             //Assert
             Assert.Null(exception);
             Assert.NotNull(_matchStartedDto);
@@ -161,6 +169,34 @@ namespace MatchService.IntegrationTests
             Assert.InRange(_matchStartedDto.StartedAtUtc, DateTime.UtcNow - TimeSpan.FromMilliseconds(1000), DateTime.UtcNow);
             Assert.Equal("Kolian", _matchStartedDto.Acceptor);
             Assert.Equal("Kolian", _matchStartedDto.WhiteSidePlayer);
+            Assert.NotNull((await Harness.Published.SelectAsync<MatchStarted>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
+        }
+
+        [Fact]
+        public async Task AcceptMatch_WithValidInputWhiteSideIsAcceptorAndTimeLimitIsNotNull()
+        {
+            //Arrange
+            var matchId = Guid.Parse("03ABA126-1ABA-4CA0-A2CF-F7B9255C787D");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
+
+            SetConnectionHandlers(hubConnection);
+
+            //Act
+            await hubConnection.StartAsync();
+
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("AcceptMatch", matchId));
+
+            await WaitForResponse(5000);
+
+            //Assert
+            Assert.Null(exception);
+            Assert.NotNull(_matchStartedDto);
+            Assert.Equal(matchId, _matchStartedDto.MatchId);
+            Assert.InRange(_matchStartedDto.StartedAtUtc, DateTime.UtcNow - TimeSpan.FromMilliseconds(1000), DateTime.UtcNow);
+            Assert.Equal("Kolian", _matchStartedDto.Acceptor);
+            Assert.Equal("Tolian", _matchStartedDto.WhiteSidePlayer);
+            Assert.NotNull((await Harness.Published.SelectAsync<MatchStarted>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
+            Assert.NotNull((await Harness.Published.SelectAsync<SideToActChanged>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
         }
 
         public override Task DisposeAsync()

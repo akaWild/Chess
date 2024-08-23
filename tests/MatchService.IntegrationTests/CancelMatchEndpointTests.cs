@@ -1,4 +1,7 @@
 ﻿using AutoFixture;
+using EventsLib;
+using MassTransit.Internals;
+using MassTransit.Testing;
 using MatchService.IntegrationTests.Fixtures;
 using MatchService.IntegrationTests.Utils;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -12,10 +15,14 @@ namespace MatchService.IntegrationTests
         private readonly string? _tolianToken;
         private readonly string? _kolianToken;
 
+        private readonly ITestHarness _harness;
+
         private Guid _matchId;
 
         public CancelMatchEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
+            _harness = Factory.Services.GetTestHarness();
+
             _tokenWithoutUser = TokenHelper.GetAccessToken(factory);
             _tolianToken = TokenHelper.GetAccessToken(factory, "Tolian");
             _kolianToken = TokenHelper.GetAccessToken(factory, "Kolian");
@@ -130,8 +137,11 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
+            await WaitForResponse(5000);
+
             //Assert
             Assert.Null(exception);
+            Assert.NotNull((await _harness.Published.SelectAsync<MatchCancelled>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
             Assert.Equal(matchId, _matchId);
         }
 

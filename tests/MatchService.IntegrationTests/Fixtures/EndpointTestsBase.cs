@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using MassTransit.Testing;
 using MatchService.Data;
 using MatchService.IntegrationTests.Utils;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -12,6 +13,8 @@ namespace MatchService.IntegrationTests.Fixtures
         protected readonly CustomWebAppFactory Factory;
         protected readonly HttpMessageHandler HttpMessageHandler;
 
+        protected readonly ITestHarness Harness;
+
         protected bool ResponseReceived = false;
         protected string? ClientErrorMessage;
         protected string? ServerErrorMessage;
@@ -19,9 +22,9 @@ namespace MatchService.IntegrationTests.Fixtures
         public EndpointTestsBase(CustomWebAppFactory factory)
         {
             Fixture = new Fixture();
-
             Factory = factory;
             HttpMessageHandler = Factory.Server.CreateHandler();
+            Harness = Factory.Services.GetTestHarness();
         }
 
         public virtual Task InitializeAsync()

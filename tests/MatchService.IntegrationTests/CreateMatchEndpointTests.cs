@@ -1,4 +1,7 @@
 ﻿using AutoFixture;
+using EventsLib;
+using MassTransit.Internals;
+using MassTransit.Testing;
 using MatchService.DTOs;
 using MatchService.IntegrationTests.Fixtures;
 using MatchService.IntegrationTests.Utils;
@@ -13,11 +16,15 @@ namespace MatchService.IntegrationTests
         private readonly string? _tokenWithoutUser;
         private readonly string? _validToken;
 
+        private readonly ITestHarness _harness;
+
         private MatchCreatedDto? _matchCreatedDto;
         private MatchStartedDto? _matchStartedDto;
 
         public CreateMatchEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
+            _harness = Factory.Services.GetTestHarness();
+
             _tokenWithoutUser = TokenHelper.GetAccessToken(factory);
             _validToken = TokenHelper.GetAccessToken(factory, "Tolian");
         }
@@ -307,6 +314,8 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CreateMatch", createMatchDto));
 
+            await WaitForResponse(5000);
+
             //Assert
             Assert.Null(exception);
             Assert.NotNull(_matchCreatedDto);
@@ -314,6 +323,7 @@ namespace MatchService.IntegrationTests
             Assert.Equal("Tolian", _matchCreatedDto.Creator);
             Assert.InRange(_matchCreatedDto.CreatedAtUtc, DateTime.UtcNow - TimeSpan.FromMilliseconds(1000), DateTime.UtcNow);
             Assert.Null(_matchStartedDto);
+            Assert.NotNull((await _harness.Published.SelectAsync<MatchCreated>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == createMatchDto.MatchId));
         }
 
         [Fact]
@@ -337,6 +347,8 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CreateMatch", createMatchDto));
 
+            await WaitForResponse(5000);
+
             //Assert
             Assert.Null(exception);
             Assert.NotNull(_matchCreatedDto);
@@ -344,6 +356,7 @@ namespace MatchService.IntegrationTests
             Assert.Equal("Tolian", _matchCreatedDto.Creator);
             Assert.InRange(_matchCreatedDto.CreatedAtUtc, DateTime.UtcNow - TimeSpan.FromMilliseconds(1000), DateTime.UtcNow);
             Assert.NotNull(_matchStartedDto);
+            Assert.NotNull((await _harness.Published.SelectAsync<MatchCreated>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == createMatchDto.MatchId));
         }
 
         public override Task DisposeAsync()
