@@ -67,6 +67,9 @@ namespace MatchService.Features.AcceptMatch
 
             await _publishEndpoint.Publish(_mapper.Map<MatchStarted>(match), cancellationToken);
 
+            if (match.TimeLimit != null)
+                await _publishEndpoint.Publish(new SideToActChanged(match.MatchId, 0, match.CreatedAtUtc + TimeSpan.FromSeconds(match.TimeLimit.Value)), cancellationToken);
+
             return _mapper.Map<MatchStartedDto>(match);
         }
     }
