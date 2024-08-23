@@ -314,7 +314,7 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CreateMatch", createMatchDto));
 
-            await WaitForResponse(5000);
+            await WaitForResponse(2000);
 
             //Assert
             Assert.Null(exception);
@@ -347,7 +347,7 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CreateMatch", createMatchDto));
 
-            await WaitForResponse(5000);
+            await WaitForResponse(2000);
 
             //Assert
             Assert.Null(exception);

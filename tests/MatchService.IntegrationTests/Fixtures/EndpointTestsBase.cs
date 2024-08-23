@@ -70,6 +70,8 @@ namespace MatchService.IntegrationTests.Fixtures
             {
                 if (DateTime.Now - startTime > TimeSpan.FromMilliseconds(timeout))
                     break;
+
+                Thread.Sleep(10);
             }
 
             return Task.CompletedTask;

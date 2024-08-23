@@ -137,7 +137,7 @@ namespace MatchService.IntegrationTests
 
             Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("CancelMatch", matchId));
 
-            await WaitForResponse(5000);
+            await WaitForResponse(2000);
 
             //Assert
             Assert.Null(exception);
