@@ -6,6 +6,7 @@ using MatchService.Features.AcceptMatch;
 using MatchService.Features.CancelMatch;
 using MatchService.Features.CreateMatch;
 using MatchService.Features.GetCurrentMatch;
+using MatchService.Features.RequestDraw;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Connections.Features;
@@ -256,6 +257,32 @@ namespace MatchService.UnitTests
             //Arrange
             _senderMock.Verify(x => x.Send(It.IsAny<AcceptMatchCommand>(), CancellationToken.None), Times.Once);
             _clientProxyMock.Verify(c => c.SendCoreAsync("MatchStarted", new object[] { matchStartedDto }, CancellationToken.None), Times.Once);
+            _clientProxyMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task RequestDraw_VerifyCalls()
+        {
+            //Arrange
+            var matchId = _fixture.Create<Guid>();
+            var drawRequestedDto = _fixture.Create<DrawRequestedDto>();
+
+            var hub = new MatchHub(_senderMock.Object)
+            {
+                Context = _contextMock.Object,
+                Groups = _groupsMock.Object,
+                Clients = _clientsMock.Object
+            };
+
+            _senderMock.Setup(x => x.Send(It.IsAny<RequestDrawCommand>(), CancellationToken.None)).ReturnsAsync(drawRequestedDto);
+            _clientsMock.Setup(clients => clients.Group(matchId.ToString())).Returns(_clientProxyMock.Object);
+
+            //Act
+            await hub.RequestDraw(matchId);
+
+            //Arrange
+            _senderMock.Verify(x => x.Send(It.IsAny<RequestDrawCommand>(), CancellationToken.None), Times.Once);
+            _clientProxyMock.Verify(c => c.SendCoreAsync("DrawRequested", new object[] { drawRequestedDto }, CancellationToken.None), Times.Once);
             _clientProxyMock.VerifyNoOtherCalls();
         }
     }
