@@ -2,6 +2,7 @@ using AutoFixture;
 using MatchService.DTOs;
 using MatchService.Exceptions;
 using MatchService.Features;
+using MatchService.Features.AcceptDraw;
 using MatchService.Features.AcceptMatch;
 using MatchService.Features.CancelMatch;
 using MatchService.Features.CreateMatch;
@@ -283,6 +284,32 @@ namespace MatchService.UnitTests
             //Arrange
             _senderMock.Verify(x => x.Send(It.IsAny<RequestDrawCommand>(), CancellationToken.None), Times.Once);
             _clientProxyMock.Verify(c => c.SendCoreAsync("DrawRequested", new object[] { drawRequestedDto }, CancellationToken.None), Times.Once);
+            _clientProxyMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task AcceptDraw_VerifyCalls()
+        {
+            //Arrange
+            var matchId = _fixture.Create<Guid>();
+            var matchFinishedDto = _fixture.Create<MatchFinishedDto>();
+
+            var hub = new MatchHub(_senderMock.Object)
+            {
+                Context = _contextMock.Object,
+                Groups = _groupsMock.Object,
+                Clients = _clientsMock.Object
+            };
+
+            _senderMock.Setup(x => x.Send(It.IsAny<AcceptDrawCommand>(), CancellationToken.None)).ReturnsAsync(matchFinishedDto);
+            _clientsMock.Setup(clients => clients.Group(matchId.ToString())).Returns(_clientProxyMock.Object);
+
+            //Act
+            await hub.AcceptDraw(matchId);
+
+            //Arrange
+            _senderMock.Verify(x => x.Send(It.IsAny<AcceptDrawCommand>(), CancellationToken.None), Times.Once);
+            _clientProxyMock.Verify(c => c.SendCoreAsync("MatchFinished", new object[] { matchFinishedDto }, CancellationToken.None), Times.Once);
             _clientProxyMock.VerifyNoOtherCalls();
         }
     }
