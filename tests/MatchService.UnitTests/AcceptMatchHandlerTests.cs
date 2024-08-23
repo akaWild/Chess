@@ -70,9 +70,12 @@ namespace MatchService.UnitTests
             _matchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
 
             //Act
+            Exception? exception = await Record.ExceptionAsync(() => sut.Handle(matchCommand, CancellationToken.None));
 
             //Assert
-            await Assert.ThrowsAsync<MatchAcceptanceException>(() => sut.Handle(matchCommand, CancellationToken.None));
+            Assert.NotNull(exception);
+            Assert.IsType<MatchAcceptanceException>(exception);
+            Assert.Matches("not started match can be accepted", exception.Message);
         }
 
         [Fact]
@@ -89,9 +92,12 @@ namespace MatchService.UnitTests
             _matchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
 
             //Act
+            Exception? exception = await Record.ExceptionAsync(() => sut.Handle(matchCommand, CancellationToken.None));
 
             //Assert
-            await Assert.ThrowsAsync<MatchAcceptanceException>(() => sut.Handle(matchCommand, CancellationToken.None));
+            Assert.NotNull(exception);
+            Assert.IsType<MatchAcceptanceException>(exception);
+            Assert.Matches("can't be accepted by match creator", exception.Message);
         }
 
         [Fact]

@@ -61,14 +61,19 @@ namespace MatchService.UnitTests
             var sut = new CancelMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object);
             var matchCommand = new CancelMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
             var matchStatus = _fixture.Create<Generator<MatchStatus>>().First(s => s != MatchStatus.Created);
-            var match = _fixture.Build<Match>().With(x => x.Status, matchStatus).Create();
+            var match = _fixture.Build<Match>()
+                .With(x => x.Status, matchStatus)
+                .Create();
 
             _matchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
 
             //Act
+            Exception? exception = await Record.ExceptionAsync(() => sut.Handle(matchCommand, CancellationToken.None));
 
             //Assert
-            await Assert.ThrowsAsync<MatchCancellationException>(() => sut.Handle(matchCommand, CancellationToken.None));
+            Assert.NotNull(exception);
+            Assert.IsType<MatchCancellationException>(exception);
+            Assert.Matches("not started match can be cancelled", exception.Message);
         }
 
         [Fact]
@@ -77,14 +82,19 @@ namespace MatchService.UnitTests
             //Arrange
             var sut = new CancelMatchHandler(_matchRepositoryMock.Object, _publishEndpoint.Object);
             var matchCommand = new CancelMatchCommand(It.IsAny<Guid>(), _fixture.Create<string>());
-            var match = _fixture.Build<Match>().With(x => x.Status, MatchStatus.Created).Create();
+            var match = _fixture.Build<Match>()
+                .With(x => x.Status, MatchStatus.Created)
+                .Create();
 
             _matchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
 
             //Act
+            Exception? exception = await Record.ExceptionAsync(() => sut.Handle(matchCommand, CancellationToken.None));
 
             //Assert
-            await Assert.ThrowsAsync<MatchCancellationException>(() => sut.Handle(matchCommand, CancellationToken.None));
+            Assert.NotNull(exception);
+            Assert.IsType<MatchCancellationException>(exception);
+            Assert.Matches("cancelled only by match creator", exception.Message);
         }
 
         [Fact]
