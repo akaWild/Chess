@@ -61,6 +61,29 @@ namespace MatchService.IntegrationTests.Utils
                 },
                 new Match
                 {
+                    MatchId = Guid.Parse("1DA76931-6686-4F74-BB49-32157C6FB67A"),
+                    Creator = "Dimon",
+                    StartedAtUtc = DateTime.UtcNow,
+                    WhiteSidePlayer = "Dimon",
+                    ActingSide = MatchSide.White,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    Board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                },
+                new Match
+                {
+                    MatchId = Guid.Parse("88275D09-CC64-47E4-B433-7BE6B3DB47A1"),
+                    Creator = "Tolian",
+                    StartedAtUtc = DateTime.UtcNow,
+                    WhiteSidePlayer = "Tolian",
+                    ActingSide = MatchSide.White,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    Board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                    DrawRequestedSide = MatchSide.Black
+                },
+                new Match
+                {
                     MatchId = Guid.Parse("3979B95F-BA5D-4EF7-8405-C9D23BD9609E"),
                     Creator = "Tolian",
                     StartedAtUtc = DateTime.UtcNow,
