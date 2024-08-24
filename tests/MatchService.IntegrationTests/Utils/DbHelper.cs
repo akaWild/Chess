@@ -61,6 +61,19 @@ namespace MatchService.IntegrationTests.Utils
                 },
                 new Match
                 {
+                    MatchId = Guid.Parse("61711E02-A185-40EF-A0EA-67FE88D72E1D"),
+                    Creator = "Tolian",
+                    StartedAtUtc = DateTime.UtcNow - TimeSpan.FromMinutes(5),
+                    WhiteSidePlayer = "Tolian",
+                    ActingSide = MatchSide.White,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    TimeLimit = 3600,
+                    Board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                    WhiteSideTimeRemaining = 60
+                },
+                new Match
+                {
                     MatchId = Guid.Parse("1DA76931-6686-4F74-BB49-32157C6FB67A"),
                     Creator = "Dimon",
                     StartedAtUtc = DateTime.UtcNow,
@@ -93,6 +106,21 @@ namespace MatchService.IntegrationTests.Utils
                     Acceptor = "Kolian",
                     Board = "rnbqkbnr/ppp1pppp/8/3p4/4P3/3B4/PPPP1PPP/RNBQK1NR b KQkq - 1 2",
                     History = new []{"e4", "d5", "Bd3"}
+                },
+                new Match
+                {
+                    MatchId = Guid.Parse("97B66057-C123-4671-9F14-BE33AA08916F"),
+                    Creator = "Tolian",
+                    StartedAtUtc = DateTime.UtcNow - TimeSpan.FromMinutes(10),
+                    LastMoveMadeAtUtc = DateTime.UtcNow - TimeSpan.FromMinutes(5),
+                    WhiteSidePlayer = "Tolian",
+                    ActingSide = MatchSide.Black,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    TimeLimit = 3600,
+                    Board = "rnbqkbnr/ppp1pppp/8/3p4/4P3/3B4/PPPP1PPP/RNBQK1NR b KQkq - 1 2",
+                    History = new []{"e4", "d5", "Bd3"},
+                    BlackSideTimeRemaining = 60
                 }
             };
         }

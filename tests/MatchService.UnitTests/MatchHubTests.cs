@@ -262,7 +262,7 @@ namespace MatchService.UnitTests
         }
 
         [Fact]
-        public async Task RequestDraw_VerifyCalls()
+        public async Task RequestDrawWithoutExpiration_VerifyCalls()
         {
             //Arrange
             var matchId = _fixture.Create<Guid>();
@@ -284,6 +284,32 @@ namespace MatchService.UnitTests
             //Arrange
             _senderMock.Verify(x => x.Send(It.IsAny<RequestDrawCommand>(), CancellationToken.None), Times.Once);
             _clientProxyMock.Verify(c => c.SendCoreAsync("DrawRequested", new object[] { drawRequestedDto }, CancellationToken.None), Times.Once);
+            _clientProxyMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task RequestDrawWithExpiration_VerifyCalls()
+        {
+            //Arrange
+            var matchId = _fixture.Create<Guid>();
+            var matchFinishedDto = _fixture.Create<MatchFinishedDto>();
+
+            var hub = new MatchHub(_senderMock.Object)
+            {
+                Context = _contextMock.Object,
+                Groups = _groupsMock.Object,
+                Clients = _clientsMock.Object
+            };
+
+            _senderMock.Setup(x => x.Send(It.IsAny<RequestDrawCommand>(), CancellationToken.None)).ReturnsAsync(matchFinishedDto);
+            _clientsMock.Setup(clients => clients.Group(matchId.ToString())).Returns(_clientProxyMock.Object);
+
+            //Act
+            await hub.RequestDraw(matchId);
+
+            //Arrange
+            _senderMock.Verify(x => x.Send(It.IsAny<RequestDrawCommand>(), CancellationToken.None), Times.Once);
+            _clientProxyMock.Verify(c => c.SendCoreAsync("MatchFinished", new object[] { matchFinishedDto }, CancellationToken.None), Times.Once);
             _clientProxyMock.VerifyNoOtherCalls();
         }
 

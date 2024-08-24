@@ -1,6 +1,8 @@
-﻿namespace MatchService.DTOs
+﻿using MatchService.Interfaces;
+
+namespace MatchService.DTOs
 {
-    public record MatchFinishedDto
+    public record MatchFinishedDto : IMatchDto
     {
         public required Guid MatchId { get; init; }
         public required DateTime EndedAtUtc { get; init; }

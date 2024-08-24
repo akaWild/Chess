@@ -16,6 +16,7 @@ namespace MatchService.IntegrationTests
         private readonly string? _kolianToken;
 
         private DrawRequestedDto? _drawRequestedDto;
+        private MatchFinishedDto? _matchFinishedDto;
 
         public RequestDrawEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
@@ -177,7 +178,7 @@ namespace MatchService.IntegrationTests
         }
 
         [Fact]
-        public async Task RequestDraw_WithValidInputAsBlack()
+        public async Task RequestDraw_WithValidInputAsBlackWithoutTimeout()
         {
             //Arrange
             var matchId = Guid.Parse("38B56259-55C0-4821-AA4F-D83ED7B58FDF");
@@ -201,7 +202,33 @@ namespace MatchService.IntegrationTests
         }
 
         [Fact]
-        public async Task RequestDraw_WithValidInputAsWhite()
+        public async Task RequestDraw_WithValidInputAsBlackWithTimeout()
+        {
+            //Arrange
+            var matchId = Guid.Parse("61711E02-A185-40EF-A0EA-67FE88D72E1D");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
+
+            SetConnectionHandlers(hubConnection);
+
+            //Act
+            await hubConnection.StartAsync();
+
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("RequestDraw", matchId));
+
+            await WaitForResponse(2000);
+
+            //Assert
+            Assert.Null(exception);
+            Assert.NotNull(_matchFinishedDto);
+            Assert.Equal(matchId, _matchFinishedDto.MatchId);
+            Assert.Equal("Kolian", _matchFinishedDto.Winner);
+            Assert.Equal("OnTime", _matchFinishedDto.WinBy);
+            Assert.Null(_matchFinishedDto.DrawBy);
+            Assert.NotNull((await Harness.Published.SelectAsync<MatchFinished>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
+        }
+
+        [Fact]
+        public async Task RequestDraw_WithValidInputAsWhiteWithoutTimeout()
         {
             //Arrange
             var matchId = Guid.Parse("3979B95F-BA5D-4EF7-8405-C9D23BD9609E");
@@ -224,6 +251,32 @@ namespace MatchService.IntegrationTests
             Assert.NotNull((await Harness.Published.SelectAsync<DrawRequested>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
         }
 
+        [Fact]
+        public async Task RequestDraw_WithValidInputAsWhiteWithTimeout()
+        {
+            //Arrange
+            var matchId = Guid.Parse("97B66057-C123-4671-9F14-BE33AA08916F");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: matchId.ToString());
+
+            SetConnectionHandlers(hubConnection);
+
+            //Act
+            await hubConnection.StartAsync();
+
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("RequestDraw", matchId));
+
+            await WaitForResponse(2000);
+
+            //Assert
+            Assert.Null(exception);
+            Assert.NotNull(_matchFinishedDto);
+            Assert.Equal(matchId, _matchFinishedDto.MatchId);
+            Assert.Equal("Tolian", _matchFinishedDto.Winner);
+            Assert.Equal("OnTime", _matchFinishedDto.WinBy);
+            Assert.Null(_matchFinishedDto.DrawBy);
+            Assert.NotNull((await Harness.Published.SelectAsync<MatchFinished>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
+        }
+
         public override Task DisposeAsync()
         {
             _drawRequestedDto = null;
@@ -238,6 +291,12 @@ namespace MatchService.IntegrationTests
             hubConnection.On<DrawRequestedDto>("DrawRequested", (dto) =>
             {
                 _drawRequestedDto = dto;
+
+                ResponseReceived = true;
+            });
+            hubConnection.On<MatchFinishedDto>("MatchFinished", (dto) =>
+            {
+                _matchFinishedDto = dto;
 
                 ResponseReceived = true;
             });

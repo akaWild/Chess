@@ -1,4 +1,5 @@
-﻿using EventsLib;
+﻿using AutoMapper;
+using EventsLib;
 using MassTransit;
 using MatchService.DTOs;
 using MatchService.Exceptions;
@@ -9,20 +10,24 @@ using SharedLib.CQRS;
 namespace MatchService.Features.RequestDraw
 {
     public record RequestDrawCommand(Guid MatchId, string? User)
-        : ICommand<DrawRequestedDto>;
+        : ICommand<IMatchDto>;
 
-    public class RequestDrawHandler : ICommandHandler<RequestDrawCommand, DrawRequestedDto>
+    public class RequestDrawHandler : ICommandHandler<RequestDrawCommand, IMatchDto>
     {
         private readonly IMatchRepository _matchRepo;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IMapper _mapper;
+        private readonly ILocalExpirationService _expService;
 
-        public RequestDrawHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint)
+        public RequestDrawHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint, IMapper mapper, ILocalExpirationService expService)
         {
             _matchRepo = matchRepo;
             _publishEndpoint = publishEndpoint;
+            _mapper = mapper;
+            _expService = expService;
         }
 
-        public async Task<DrawRequestedDto> Handle(RequestDrawCommand request, CancellationToken cancellationToken)
+        public async Task<IMatchDto> Handle(RequestDrawCommand request, CancellationToken cancellationToken)
         {
             if (request.User == null)
                 throw new UserNotAuthenticated("User is not authenticated");
@@ -48,8 +53,28 @@ namespace MatchService.Features.RequestDraw
 
             match.DrawRequestedSide = match.ActingSide == MatchSide.White ? MatchSide.Black : MatchSide.White;
 
+            string? winner = _expService.GetWinner(match);
+
+            if (winner != null)
+            {
+                match.EndedAtUtc = DateTime.UtcNow;
+                match.Status = MatchStatus.Finished;
+                match.ActingSide = null;
+                match.DrawRequestedSide = null;
+                match.DrawBy = null;
+                match.WinBy = WinDescriptor.OnTime;
+                match.Winner = winner;
+            }
+
             _matchRepo.RemoveMatch(match);
             await _matchRepo.SaveChangesAsync();
+
+            if (winner != null)
+            {
+                await _publishEndpoint.Publish(_mapper.Map<MatchFinished>(match), cancellationToken);
+
+                return _mapper.Map<MatchFinishedDto>(match);
+            }
 
             await _publishEndpoint.Publish(new DrawRequested(request.MatchId, (int)match.DrawRequestedSide), cancellationToken);
 

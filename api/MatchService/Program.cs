@@ -5,6 +5,7 @@ using MatchService.Extensions;
 using MatchService.Features;
 using MatchService.Features.CreateMatch;
 using MatchService.Interfaces;
+using MatchService.Services;
 using MatchService.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,7 @@ builder.Services.AddSignalR().AddHubOptions<MatchHub>(options =>
 });
 builder.Services.AddAuthServices(builder.Configuration);
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
+builder.Services.AddScoped<ILocalExpirationService, LocalExpirationService>();
 
 var app = builder.Build();
 

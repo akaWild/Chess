@@ -1,6 +1,8 @@
-﻿namespace MatchService.DTOs;
+﻿using MatchService.Interfaces;
 
-public record DrawRequestedDto
+namespace MatchService.DTOs;
+
+public record DrawRequestedDto : IMatchDto
 {
     public required Guid MatchId { get; init; }
     public required int RequestSide { get; init; }
