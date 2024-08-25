@@ -2,7 +2,7 @@
 using EventsLib;
 using MatchService.DTOs;
 using MatchService.Exceptions;
-using MatchService.Features.AcceptDraw;
+using MatchService.Features.RejectDraw;
 using MatchService.Interfaces;
 using MatchService.Models;
 using Moq;
@@ -10,11 +10,11 @@ using Match = MatchService.Models.Match;
 
 namespace MatchService.UnitTests
 {
-    public class AcceptDrawHandlerTests : HandlerTestsBase
+    public class RejectDrawHandlerTests : HandlerTestsBase
     {
         private readonly Mock<ILocalExpirationService> _expServiceMock;
 
-        public AcceptDrawHandlerTests()
+        public RejectDrawHandlerTests()
         {
             _expServiceMock = new Mock<ILocalExpirationService>();
         }
@@ -23,8 +23,8 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNoUser_ThrowsUserNotAuthenticated()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), null);
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(It.IsAny<Guid>(), null);
 
             //Act
 
@@ -36,8 +36,8 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNullMatch_ThrowsMatchNotFoundException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
 
             MatchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync((Match?)null);
 
@@ -48,11 +48,11 @@ namespace MatchService.UnitTests
         }
 
         [Fact]
-        public async Task Handle_WithNotParticipant_ThrowsMatchDrawAcceptException()
+        public async Task Handle_WithNotParticipant_ThrowsMatchDrawRejectException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Create<Match>();
 
             MatchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
@@ -62,16 +62,16 @@ namespace MatchService.UnitTests
 
             //Assert
             Assert.NotNull(exception);
-            Assert.IsType<DrawAcceptException>(exception);
+            Assert.IsType<DrawRejectException>(exception);
             Assert.Matches("only by match participant", exception.Message);
         }
 
         [Fact]
-        public async Task Handle_WithNotInProgressMatchStatus_ThrowsMatchDrawAcceptException()
+        public async Task Handle_WithNotInProgressMatchStatus_ThrowsMatchDrawRejectException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var matchStatus = Fixture.Create<Generator<MatchStatus>>().First(s => s != MatchStatus.InProgress);
             var match = Fixture.Build<Match>()
                 .With(x => x.Status, matchStatus)
@@ -85,16 +85,16 @@ namespace MatchService.UnitTests
 
             //Assert
             Assert.NotNull(exception);
-            Assert.IsType<DrawAcceptException>(exception);
+            Assert.IsType<DrawRejectException>(exception);
             Assert.Matches("only on active match", exception.Message);
         }
 
         [Fact]
-        public async Task Handle_WithDrawRequestedSideNull_ThrowsMatchDrawAcceptException()
+        public async Task Handle_WithDrawRequestedSideNull_ThrowsMatchDrawRejectException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
@@ -108,16 +108,16 @@ namespace MatchService.UnitTests
 
             //Assert
             Assert.NotNull(exception);
-            Assert.IsType<DrawAcceptException>(exception);
+            Assert.IsType<DrawRejectException>(exception);
             Assert.Matches("there wasn't previous request", exception.Message);
         }
 
         [Fact]
-        public async Task Handle_WithDrawRequestedByIdleSideAsWhite_ThrowsMatchDrawAcceptException()
+        public async Task Handle_WithDrawRequestedByIdleSideAsWhite_ThrowsMatchDrawRejectException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
@@ -131,16 +131,16 @@ namespace MatchService.UnitTests
 
             //Assert
             Assert.NotNull(exception);
-            Assert.IsType<DrawAcceptException>(exception);
+            Assert.IsType<DrawRejectException>(exception);
             Assert.Matches("only by active side of the match", exception.Message);
         }
 
         [Fact]
-        public async Task Handle_WithDrawRequestedByIdleSideAsBlack_ThrowsMatchDrawAcceptException()
+        public async Task Handle_WithDrawRequestedByIdleSideAsBlack_ThrowsMatchDrawRejectException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
@@ -155,7 +155,7 @@ namespace MatchService.UnitTests
 
             //Assert
             Assert.NotNull(exception);
-            Assert.IsType<DrawAcceptException>(exception);
+            Assert.IsType<DrawRejectException>(exception);
             Assert.Matches("only by active side of the match", exception.Message);
         }
 
@@ -163,15 +163,19 @@ namespace MatchService.UnitTests
         public async Task Handle_WithValidInputNoExpiration_ShouldReturnCorrectDto()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.MatchId, matchCommand.MatchId)
                 .With(x => x.StartedAtUtc, DateTime.UtcNow)
+                .With(x => x.EndedAtUtc, (DateTime?)null)
                 .With(x => x.LastMoveMadeAtUtc, (DateTime?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
                 .With(x => x.ActingSide, MatchSide.White)
+                .With(x => x.DrawBy, (DrawDescriptor?)null)
+                .With(x => x.WinBy, (WinDescriptor?)null)
+                .With(x => x.Winner, (string?)null)
                 .With(x => x.WhiteSidePlayer, matchCommand.User)
                 .With(x => x.WhiteSideTimeRemaining, 1000)
                 .With(x => x.BlackSideTimeRemaining, 1000)
@@ -184,25 +188,24 @@ namespace MatchService.UnitTests
 
             //Assert
             Assert.Equal(match.MatchId, matchCommand.MatchId);
-            Assert.NotNull(match.EndedAtUtc);
-            Assert.InRange(match.EndedAtUtc.Value, DateTime.UtcNow - TimeSpan.FromSeconds(1), DateTime.UtcNow);
+            Assert.Null(match.EndedAtUtc);
             Assert.Null(match.Winner);
             Assert.Null(match.WinBy);
-            Assert.NotNull(match.DrawBy);
-            Assert.Equal(DrawDescriptor.Agreement, match.DrawBy);
+            Assert.Null(match.DrawBy);
+            Assert.Null(match.DrawRequestedSide);
 
             MatchRepositoryMock.Verify(x => x.SaveChangesAsync(), Times.Once);
-            MapperMock.Verify(x => x.Map<MatchFinished>(It.IsAny<Match>()), Times.Once);
-            MapperMock.Verify(x => x.Map<MatchFinishedDto>(It.IsAny<Match>()), Times.Once);
-            PublishEndpoint.Verify(x => x.Publish(It.IsAny<MatchFinished>(), CancellationToken.None), Times.Once);
+            MapperMock.Verify(x => x.Map<MatchFinished>(It.IsAny<Match>()), Times.Never);
+            MapperMock.Verify(x => x.Map<MatchFinishedDto>(It.IsAny<Match>()), Times.Never);
+            PublishEndpoint.Verify(x => x.Publish(It.IsAny<DrawRejected>(), CancellationToken.None), Times.Once);
         }
 
         [Fact]
         public async Task Handle_WithValidInputAndExpiration_ShouldReturnCorrectDto()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
-            var matchCommand = new AcceptDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
+            var sut = new RejectDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RejectDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.MatchId, matchCommand.MatchId)
                 .With(x => x.StartedAtUtc, DateTime.UtcNow - TimeSpan.FromMinutes(5))
@@ -210,6 +213,7 @@ namespace MatchService.UnitTests
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
                 .With(x => x.ActingSide, MatchSide.White)
+                .With(x => x.DrawBy, (DrawDescriptor?)null)
                 .With(x => x.WhiteSidePlayer, matchCommand.User)
                 .With(x => x.WhiteSideTimeRemaining, 60)
                 .With(x => x.BlackSideTimeRemaining, 60)

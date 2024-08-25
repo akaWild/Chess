@@ -7,19 +7,19 @@ using MatchService.Interfaces;
 using MatchService.Models;
 using SharedLib.CQRS;
 
-namespace MatchService.Features.AcceptDraw
+namespace MatchService.Features.RejectDraw
 {
-    public record AcceptDrawCommand(Guid MatchId, string? User)
-        : ICommand<MatchFinishedDto>;
+    public record RejectDrawCommand(Guid MatchId, string? User)
+        : ICommand<IMatchDto>;
 
-    public class AcceptDrawHandler : ICommandHandler<AcceptDrawCommand, MatchFinishedDto>
+    public class RejectDrawHandler : ICommandHandler<RejectDrawCommand, IMatchDto>
     {
         private readonly IMatchRepository _matchRepo;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IMapper _mapper;
         private readonly ILocalExpirationService _expService;
 
-        public AcceptDrawHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint, IMapper mapper, ILocalExpirationService expService)
+        public RejectDrawHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint, IMapper mapper, ILocalExpirationService expService)
         {
             _matchRepo = matchRepo;
             _publishEndpoint = publishEndpoint;
@@ -27,7 +27,7 @@ namespace MatchService.Features.AcceptDraw
             _expService = expService;
         }
 
-        public async Task<MatchFinishedDto> Handle(AcceptDrawCommand request, CancellationToken cancellationToken)
+        public async Task<IMatchDto> Handle(RejectDrawCommand request, CancellationToken cancellationToken)
         {
             if (request.User == null)
                 throw new UserNotAuthenticated("User is not authenticated");
@@ -37,46 +37,50 @@ namespace MatchService.Features.AcceptDraw
                 throw new MatchNotFoundException($"Match with id {request.MatchId} wasn't found");
 
             if (request.User != match.Creator && request.User != match.Acceptor)
-                throw new DrawAcceptException("Draw can be accepted only by match participant");
+                throw new DrawRejectException("Draw can be rejected only by match participant");
 
             if (match.Status != MatchStatus.InProgress)
-                throw new DrawAcceptException("Draw can be accepted only on active match");
+                throw new DrawRejectException("Draw can be rejected only on active match");
 
             if (match.DrawRequestedSide == null)
-                throw new DrawAcceptException("Can't accept draw because there wasn't previous request");
+                throw new DrawRejectException("Can't reject draw because there wasn't previous request");
 
             if (match.ActingSide == MatchSide.White && match.WhiteSidePlayer != request.User)
-                throw new DrawAcceptException("Draw can be accepted only by active side of the match");
+                throw new DrawRejectException("Draw can be rejected only by active side of the match");
 
             if (match.ActingSide == MatchSide.Black && match.WhiteSidePlayer == request.User)
-                throw new DrawAcceptException("Draw can be accepted only by active side of the match");
+                throw new DrawRejectException("Draw can be rejected only by active side of the match");
 
             string? winner = _expService.GetWinner(match);
 
-            match.EndedAtUtc = DateTime.UtcNow;
-            match.Status = MatchStatus.Finished;
-            match.ActingSide = null;
+            match.DrawRequestedSide = null;
 
             if (winner != null)
             {
-                match.DrawRequestedSide = null;
+                match.EndedAtUtc = DateTime.UtcNow;
+                match.Status = MatchStatus.Finished;
+                match.ActingSide = null;
                 match.DrawBy = null;
                 match.WinBy = WinDescriptor.OnTime;
                 match.Winner = winner;
-            }
-            else
-            {
-                match.WinBy = null;
-                match.Winner = null;
-                match.DrawBy = DrawDescriptor.Agreement;
             }
 
             _matchRepo.RemoveMatch(match);
             await _matchRepo.SaveChangesAsync();
 
-            await _publishEndpoint.Publish(_mapper.Map<MatchFinished>(match), cancellationToken);
+            if (winner != null)
+            {
+                await _publishEndpoint.Publish(_mapper.Map<MatchFinished>(match), cancellationToken);
 
-            return _mapper.Map<MatchFinishedDto>(match);
+                return _mapper.Map<MatchFinishedDto>(match);
+            }
+
+            await _publishEndpoint.Publish(new DrawRejected(request.MatchId), cancellationToken);
+
+            return new DrawRejectedDto
+            {
+                MatchId = request.MatchId,
+            };
         }
     }
 }
