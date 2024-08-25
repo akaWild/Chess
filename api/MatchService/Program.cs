@@ -1,5 +1,6 @@
 using FluentValidation;
 using MassTransit;
+using MatchService.Consumers;
 using MatchService.Data;
 using MatchService.Extensions;
 using MatchService.Features;
@@ -32,6 +33,7 @@ builder.Services.AddMassTransit(x =>
         o.UsePostgres();
         o.UseBusOutbox();
     });
+    x.AddConsumersFromNamespaceContaining<TimedOutConsumer>();
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("match", false));
     x.UsingRabbitMq((context, cfg) =>
     {
