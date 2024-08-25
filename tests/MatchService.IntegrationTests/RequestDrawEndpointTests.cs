@@ -299,6 +299,7 @@ namespace MatchService.IntegrationTests
         public override Task DisposeAsync()
         {
             _drawRequestedDto = null;
+            _matchFinishedDto = null;
 
             return base.DisposeAsync();
         }
