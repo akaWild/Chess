@@ -61,6 +61,18 @@ namespace MatchService.IntegrationTests.Utils
                 },
                 new Match
                 {
+                    MatchId = Guid.Parse("BD0C1A6B-6BD0-4457-B4BA-74BD3ABD45C3"),
+                    Creator = "Tolian",
+                    StartedAtUtc = DateTime.UtcNow,
+                    WhiteSidePlayer = "Tolian",
+                    ActingSide = MatchSide.White,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    Board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                    DrawRequestedSide = MatchSide.Black
+                },
+                new Match
+                {
                     MatchId = Guid.Parse("61711E02-A185-40EF-A0EA-67FE88D72E1D"),
                     Creator = "Tolian",
                     StartedAtUtc = DateTime.UtcNow - TimeSpan.FromMinutes(5),
@@ -70,6 +82,20 @@ namespace MatchService.IntegrationTests.Utils
                     Acceptor = "Kolian",
                     TimeLimit = 3600,
                     Board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                    WhiteSideTimeRemaining = 60
+                },
+                new Match
+                {
+                    MatchId = Guid.Parse("CB3E242A-86F0-4D76-818E-C79C7C268C5E"),
+                    Creator = "Tolian",
+                    StartedAtUtc = DateTime.UtcNow - TimeSpan.FromMinutes(5),
+                    WhiteSidePlayer = "Tolian",
+                    ActingSide = MatchSide.White,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    TimeLimit = 3600,
+                    Board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                    DrawRequestedSide = MatchSide.Black,
                     WhiteSideTimeRemaining = 60
                 },
                 new Match
@@ -118,6 +144,19 @@ namespace MatchService.IntegrationTests.Utils
                     Acceptor = "Kolian",
                     Board = "rnbqkbnr/ppp1pppp/8/3p4/4P3/3B4/PPPP1PPP/RNBQK1NR b KQkq - 1 2",
                     History = new []{"e4", "d5", "Bd3"}
+                },
+                new Match
+                {
+                    MatchId = Guid.Parse("E9439209-2F4D-417E-8905-C5264756248B"),
+                    Creator = "Tolian",
+                    StartedAtUtc = DateTime.UtcNow,
+                    WhiteSidePlayer = "Tolian",
+                    ActingSide = MatchSide.Black,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    Board = "rnbqkbnr/ppp1pppp/8/3p4/4P3/3B4/PPPP1PPP/RNBQK1NR b KQkq - 1 2",
+                    History = new []{"e4", "d5", "Bd3"},
+                    DrawRequestedSide = MatchSide.White
                 },
                 new Match
                 {
