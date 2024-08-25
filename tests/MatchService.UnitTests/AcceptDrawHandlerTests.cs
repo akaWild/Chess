@@ -3,6 +3,7 @@ using EventsLib;
 using MatchService.DTOs;
 using MatchService.Exceptions;
 using MatchService.Features.AcceptDraw;
+using MatchService.Interfaces;
 using MatchService.Models;
 using Moq;
 using Match = MatchService.Models.Match;
@@ -11,11 +12,18 @@ namespace MatchService.UnitTests
 {
     public class AcceptDrawHandlerTests : HandlerTestsBase
     {
+        private readonly Mock<ILocalExpirationService> _expServiceMock;
+
+        public AcceptDrawHandlerTests()
+        {
+            _expServiceMock = new Mock<ILocalExpirationService>();
+        }
+
         [Fact]
         public async Task Handle_WithNoUser_ThrowsUserNotAuthenticated()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), null);
 
             //Act
@@ -28,7 +36,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNullMatch_ThrowsMatchNotFoundException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
 
             MatchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync((Match?)null);
@@ -43,7 +51,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNotParticipant_ThrowsMatchDrawAcceptException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Create<Match>();
 
@@ -62,7 +70,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithNotInProgressMatchStatus_ThrowsMatchDrawAcceptException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var matchStatus = Fixture.Create<Generator<MatchStatus>>().First(s => s != MatchStatus.InProgress);
             var match = Fixture.Build<Match>()
@@ -85,7 +93,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithDrawRequestedSideNotNull_ThrowsMatchDrawAcceptException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.InProgress)
@@ -108,7 +116,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithDrawRequestedByIdleSideAsWhite_ThrowsMatchDrawAcceptException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.InProgress)
@@ -131,7 +139,7 @@ namespace MatchService.UnitTests
         public async Task Handle_WithDrawRequestedByIdleSideAsBlack_ThrowsMatchDrawAcceptException()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.Status, MatchStatus.InProgress)
@@ -152,17 +160,21 @@ namespace MatchService.UnitTests
         }
 
         [Fact]
-        public async Task Handle_WithValidInput_ShouldReturnCorrectDto()
+        public async Task Handle_WithValidInputNoExpiration_ShouldReturnCorrectDto()
         {
             //Arrange
-            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object);
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new AcceptDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.MatchId, matchCommand.MatchId)
+                .With(x => x.StartedAtUtc, DateTime.UtcNow)
+                .With(x => x.LastMoveMadeAtUtc, (DateTime?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
                 .With(x => x.ActingSide, MatchSide.White)
                 .With(x => x.WhiteSidePlayer, matchCommand.User)
+                .With(x => x.WhiteSideTimeRemaining, 1000)
+                .With(x => x.BlackSideTimeRemaining, 1000)
                 .Create();
 
             MatchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
@@ -178,6 +190,45 @@ namespace MatchService.UnitTests
             Assert.Null(match.WinBy);
             Assert.NotNull(match.DrawBy);
             Assert.Equal(DrawDescriptor.Agreement, match.DrawBy);
+
+            MatchRepositoryMock.Verify(x => x.SaveChangesAsync(), Times.Once);
+            MapperMock.Verify(x => x.Map<MatchFinished>(It.IsAny<Match>()), Times.Once);
+            MapperMock.Verify(x => x.Map<MatchFinishedDto>(It.IsAny<Match>()), Times.Once);
+            PublishEndpoint.Verify(x => x.Publish(It.IsAny<MatchFinished>(), CancellationToken.None), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_WithValidInputAndExpiration_ShouldReturnCorrectDto()
+        {
+            //Arrange
+            var sut = new AcceptDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new AcceptDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
+            var match = Fixture.Build<Match>()
+                .With(x => x.MatchId, matchCommand.MatchId)
+                .With(x => x.StartedAtUtc, DateTime.UtcNow - TimeSpan.FromMinutes(5))
+                .With(x => x.LastMoveMadeAtUtc, (DateTime?)null)
+                .With(x => x.Status, MatchStatus.InProgress)
+                .With(x => x.Creator, matchCommand.User)
+                .With(x => x.ActingSide, MatchSide.White)
+                .With(x => x.WhiteSidePlayer, matchCommand.User)
+                .With(x => x.WhiteSideTimeRemaining, 60)
+                .With(x => x.BlackSideTimeRemaining, 60)
+                .Create();
+
+            MatchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
+            _expServiceMock.Setup(x => x.GetWinner(match)).Returns(Fixture.Create<string>());
+
+            //Act
+            await sut.Handle(matchCommand, CancellationToken.None);
+
+            //Assert
+            Assert.Equal(match.MatchId, matchCommand.MatchId);
+            Assert.NotNull(match.EndedAtUtc);
+            Assert.InRange(match.EndedAtUtc.Value, DateTime.UtcNow - TimeSpan.FromSeconds(1), DateTime.UtcNow);
+            Assert.NotNull(match.Winner);
+            Assert.NotNull(match.WinBy);
+            Assert.Null(match.DrawBy);
+            Assert.Equal(WinDescriptor.OnTime, match.WinBy);
 
             MatchRepositoryMock.Verify(x => x.SaveChangesAsync(), Times.Once);
             MapperMock.Verify(x => x.Map<MatchFinished>(It.IsAny<Match>()), Times.Once);

@@ -17,12 +17,14 @@ namespace MatchService.Features.AcceptDraw
         private readonly IMatchRepository _matchRepo;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IMapper _mapper;
+        private readonly ILocalExpirationService _expService;
 
-        public AcceptDrawHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint, IMapper mapper)
+        public AcceptDrawHandler(IMatchRepository matchRepo, IPublishEndpoint publishEndpoint, IMapper mapper, ILocalExpirationService expService)
         {
             _matchRepo = matchRepo;
             _publishEndpoint = publishEndpoint;
             _mapper = mapper;
+            _expService = expService;
         }
 
         public async Task<MatchFinishedDto> Handle(AcceptDrawCommand request, CancellationToken cancellationToken)
@@ -49,12 +51,25 @@ namespace MatchService.Features.AcceptDraw
             if (match.ActingSide == MatchSide.Black && match.WhiteSidePlayer == request.User)
                 throw new DrawAcceptException("Draw can be accepted only by active side of the match");
 
+            string? winner = _expService.GetWinner(match);
+
             match.EndedAtUtc = DateTime.UtcNow;
             match.Status = MatchStatus.Finished;
             match.ActingSide = null;
-            match.WinBy = null;
-            match.Winner = null;
-            match.DrawBy = DrawDescriptor.Agreement;
+
+            if (winner != null)
+            {
+                match.DrawRequestedSide = null;
+                match.DrawBy = null;
+                match.WinBy = WinDescriptor.OnTime;
+                match.Winner = winner;
+            }
+            else
+            {
+                match.WinBy = null;
+                match.Winner = null;
+                match.DrawBy = DrawDescriptor.Agreement;
+            }
 
             _matchRepo.RemoveMatch(match);
             await _matchRepo.SaveChangesAsync();
