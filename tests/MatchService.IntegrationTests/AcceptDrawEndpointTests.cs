@@ -25,13 +25,6 @@ namespace MatchService.IntegrationTests
             _kolianToken = TokenHelper.GetAccessToken(factory, "Kolian");
         }
 
-        public override Task DisposeAsync()
-        {
-            _matchFinishedDto = null;
-
-            return base.DisposeAsync();
-        }
-
         [Fact]
         public async Task AcceptDraw_WithoutToken()
         {
@@ -239,6 +232,13 @@ namespace MatchService.IntegrationTests
             Assert.Equal(nameof(WinDescriptor.OnTime), _matchFinishedDto.WinBy);
             Assert.Equal("Kolian", _matchFinishedDto.Winner);
             Assert.NotNull((await Harness.Published.SelectAsync<MatchFinished>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == matchId));
+        }
+
+        public override Task DisposeAsync()
+        {
+            _matchFinishedDto = null;
+
+            return base.DisposeAsync();
         }
 
         protected override void SetConnectionHandlers(HubConnection hubConnection)
