@@ -12,17 +12,10 @@ namespace MatchService.IntegrationTests
     [Collection("Shared collection")]
     public class AcceptMatchEndpointTests : EndpointTestsBase
     {
-        private readonly string? _tokenWithoutUser;
-        private readonly string? _tolianToken;
-        private readonly string? _kolianToken;
-
         private MatchStartedDto? _matchStartedDto;
 
         public AcceptMatchEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
-            _tokenWithoutUser = TokenHelper.GetAccessToken(factory);
-            _tolianToken = TokenHelper.GetAccessToken(factory, "Tolian");
-            _kolianToken = TokenHelper.GetAccessToken(factory, "Kolian");
         }
 
         [Fact]
@@ -49,7 +42,7 @@ namespace MatchService.IntegrationTests
         {
             //Arrange
             var matchId = Guid.Parse("7139D633-66F9-439F-8198-E5E18E9F6848");
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser, matchId: matchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -68,7 +61,7 @@ namespace MatchService.IntegrationTests
         {
             //Arrange
             var matchId = Fixture.Create<Guid>();
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: KolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -87,7 +80,7 @@ namespace MatchService.IntegrationTests
         {
             //Arrange
             var matchId = Guid.Parse("38B56259-55C0-4821-AA4F-D83ED7B58FDF");
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: KolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -106,7 +99,7 @@ namespace MatchService.IntegrationTests
         {
             //Arrange
             var matchId = Guid.Parse("7139D633-66F9-439F-8198-E5E18E9F6848");
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: matchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -125,7 +118,7 @@ namespace MatchService.IntegrationTests
         {
             //Arrange
             var matchId = Guid.Parse("34730E34-4D6E-463D-A9BA-8EC26BEBB63F");
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: KolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -151,7 +144,7 @@ namespace MatchService.IntegrationTests
         {
             //Arrange
             var matchId = Guid.Parse("03010934-839C-4DF9-BA11-643EC0FB120C");
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: KolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -177,7 +170,7 @@ namespace MatchService.IntegrationTests
         {
             //Arrange
             var matchId = Guid.Parse("03ABA126-1ABA-4CA0-A2CF-F7B9255C787D");
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: matchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: KolianToken, matchId: matchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 

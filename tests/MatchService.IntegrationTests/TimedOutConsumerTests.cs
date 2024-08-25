@@ -11,15 +11,10 @@ namespace MatchService.IntegrationTests
     [Collection("Shared collection")]
     public class TimedOutConsumerTests : EndpointTestsBase
     {
-        private readonly string? _tolianToken;
-        private readonly string? _kolianToken;
-
         private MatchFinishedDto? _matchFinishedDto;
 
         public TimedOutConsumerTests(CustomWebAppFactory factory) : base(factory)
         {
-            _tolianToken = TokenHelper.GetAccessToken(factory, "Tolian");
-            _kolianToken = TokenHelper.GetAccessToken(factory, "Kolian");
         }
 
         [Fact]
@@ -28,7 +23,7 @@ namespace MatchService.IntegrationTests
             //Arrange
             var message = Fixture.Create<TimedOut>();
 
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: message.MatchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TolianToken, matchId: message.MatchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -50,7 +45,7 @@ namespace MatchService.IntegrationTests
                 .With(x => x.MatchId, Guid.Parse("34730E34-4D6E-463D-A9BA-8EC26BEBB63F"))
                 .Create();
 
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: message.MatchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TolianToken, matchId: message.MatchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -75,7 +70,7 @@ namespace MatchService.IntegrationTests
                 .With(x => x.TimedOutSide, 0)
                 .Create();
 
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: message.MatchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: KolianToken, matchId: message.MatchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 
@@ -105,7 +100,7 @@ namespace MatchService.IntegrationTests
                 .With(x => x.TimedOutSide, 1)
                 .Create();
 
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _kolianToken, matchId: message.MatchId.ToString());
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: KolianToken, matchId: message.MatchId.ToString());
 
             SetConnectionHandlers(hubConnection);
 

@@ -13,20 +13,11 @@ namespace MatchService.IntegrationTests
     [Collection("Shared collection")]
     public class CreateMatchEndpointTests : EndpointTestsBase
     {
-        private readonly string? _tokenWithoutUser;
-        private readonly string? _validToken;
-
-        private readonly ITestHarness _harness;
-
         private MatchCreatedDto? _matchCreatedDto;
         private MatchStartedDto? _matchStartedDto;
 
         public CreateMatchEndpointTests(CustomWebAppFactory factory) : base(factory)
         {
-            _harness = Factory.Services.GetTestHarness();
-
-            _tokenWithoutUser = TokenHelper.GetAccessToken(factory);
-            _validToken = TokenHelper.GetAccessToken(factory, "Tolian");
         }
 
         [Fact]
@@ -51,7 +42,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithNullRequestDto()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -69,7 +60,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithDefaultMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -92,7 +83,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidAILevel(int aiLevel)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -115,7 +106,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidAISettings(bool? vsBot, int? aiLevel)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -140,7 +131,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidTimeLimit(int timeLimit)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -166,7 +157,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidExtraTime(int extraTime)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -191,7 +182,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidTimeSettings()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -218,7 +209,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithInvalidFirstSideToAct(int firstSideToAct)
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -244,7 +235,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithoutUser()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tokenWithoutUser);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TokenWithoutUser);
 
             SetConnectionHandlers(hubConnection);
 
@@ -270,7 +261,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithExistentMatchId()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _validToken);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TolianToken);
 
             SetConnectionHandlers(hubConnection);
 
@@ -297,7 +288,7 @@ namespace MatchService.IntegrationTests
         public async Task CreateMatch_WithValidInputVsHuman()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _validToken);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TolianToken);
 
             SetConnectionHandlers(hubConnection);
 
@@ -323,14 +314,14 @@ namespace MatchService.IntegrationTests
             Assert.Equal("Tolian", _matchCreatedDto.Creator);
             Assert.InRange(_matchCreatedDto.CreatedAtUtc, DateTime.UtcNow - TimeSpan.FromMilliseconds(1000), DateTime.UtcNow);
             Assert.Null(_matchStartedDto);
-            Assert.NotNull((await _harness.Published.SelectAsync<MatchCreated>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == createMatchDto.MatchId));
+            Assert.NotNull((await Harness.Published.SelectAsync<MatchCreated>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == createMatchDto.MatchId));
         }
 
         [Fact]
         public async Task CreateMatch_WithValidInputVsBot()
         {
             //Arrange
-            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _validToken);
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: TolianToken);
 
             SetConnectionHandlers(hubConnection);
 
@@ -356,7 +347,7 @@ namespace MatchService.IntegrationTests
             Assert.Equal("Tolian", _matchCreatedDto.Creator);
             Assert.InRange(_matchCreatedDto.CreatedAtUtc, DateTime.UtcNow - TimeSpan.FromMilliseconds(1000), DateTime.UtcNow);
             Assert.NotNull(_matchStartedDto);
-            Assert.NotNull((await _harness.Published.SelectAsync<MatchCreated>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == createMatchDto.MatchId));
+            Assert.NotNull((await Harness.Published.SelectAsync<MatchCreated>().ToListAsync()).FirstOrDefault(v => v.Context.Message.MatchId == createMatchDto.MatchId));
         }
 
         public override Task DisposeAsync()

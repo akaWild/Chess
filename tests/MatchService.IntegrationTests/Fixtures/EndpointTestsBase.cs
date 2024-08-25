@@ -13,6 +13,10 @@ namespace MatchService.IntegrationTests.Fixtures
         protected readonly CustomWebAppFactory Factory;
         protected readonly HttpMessageHandler HttpMessageHandler;
 
+        protected readonly string? TokenWithoutUser;
+        protected readonly string? TolianToken;
+        protected readonly string? KolianToken;
+
         protected readonly ITestHarness Harness;
 
         protected bool ResponseReceived = false;
@@ -25,6 +29,10 @@ namespace MatchService.IntegrationTests.Fixtures
             Factory = factory;
             HttpMessageHandler = Factory.Server.CreateHandler();
             Harness = Factory.Services.GetTestHarness();
+
+            TokenWithoutUser = TokenHelper.GetAccessToken(factory);
+            TolianToken = TokenHelper.GetAccessToken(factory, "Tolian");
+            KolianToken = TokenHelper.GetAccessToken(factory, "Kolian");
         }
 
         public virtual Task InitializeAsync()
