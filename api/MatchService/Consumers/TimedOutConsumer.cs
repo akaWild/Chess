@@ -51,7 +51,6 @@ namespace MatchService.Consumers
             match.WinBy = WinDescriptor.OnTime;
             match.Winner = winner;
 
-            _matchRepo.RemoveMatch(match);
             await _matchRepo.SaveChangesAsync();
 
             await _publishEndpoint.Publish(_mapper.Map<MatchFinished>(match));

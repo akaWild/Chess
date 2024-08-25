@@ -63,7 +63,6 @@ namespace MatchService.UnitTests
             //Assert
             Assert.Null(exception);
 
-            MatchRepositoryMock.Verify(x => x.RemoveMatch(It.IsAny<Match>()), Times.Never);
             MatchRepositoryMock.Verify(x => x.SaveChangesAsync(), Times.Never);
             MapperMock.Verify(x => x.Map<MatchFinished>(It.IsAny<Match>()), Times.Never);
             MapperMock.Verify(x => x.Map<MatchFinishedDto>(It.IsAny<Match>()), Times.Never);
@@ -110,7 +109,6 @@ namespace MatchService.UnitTests
             Assert.Equal(WinDescriptor.OnTime, match.WinBy);
             Assert.Equal(winner, match.Winner);
 
-            MatchRepositoryMock.Verify(x => x.RemoveMatch(It.IsAny<Match>()), Times.Once);
             MatchRepositoryMock.Verify(x => x.SaveChangesAsync(), Times.Once);
             MapperMock.Verify(x => x.Map<MatchFinished>(It.IsAny<Match>()), Times.Once);
             MapperMock.Verify(x => x.Map<MatchFinishedDto>(It.IsAny<Match>()), Times.Once);

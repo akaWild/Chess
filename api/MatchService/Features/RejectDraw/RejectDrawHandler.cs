@@ -65,7 +65,6 @@ namespace MatchService.Features.RejectDraw
                 match.Winner = winner;
             }
 
-            _matchRepo.RemoveMatch(match);
             await _matchRepo.SaveChangesAsync();
 
             if (winner != null)

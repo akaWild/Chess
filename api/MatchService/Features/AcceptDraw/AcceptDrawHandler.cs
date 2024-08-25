@@ -71,7 +71,6 @@ namespace MatchService.Features.AcceptDraw
                 match.DrawBy = DrawDescriptor.Agreement;
             }
 
-            _matchRepo.RemoveMatch(match);
             await _matchRepo.SaveChangesAsync();
 
             await _publishEndpoint.Publish(_mapper.Map<MatchFinished>(match), cancellationToken);
