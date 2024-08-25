@@ -48,12 +48,35 @@ namespace MatchService.UnitTests
         }
 
         [Fact]
+        public async Task Handle_WithVsBot_ThrowsMatchDrawRequestException()
+        {
+            //Arrange
+            var sut = new RequestDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
+            var matchCommand = new RequestDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
+            var match = Fixture.Build<Match>()
+                .With(x => x.AILevel, 10)
+                .Create();
+
+            MatchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
+
+            //Act
+            Exception? exception = await Record.ExceptionAsync(() => sut.Handle(matchCommand, CancellationToken.None));
+
+            //Assert
+            Assert.NotNull(exception);
+            Assert.IsType<DrawRequestException>(exception);
+            Assert.Matches("only on human vs human match", exception.Message);
+        }
+
+        [Fact]
         public async Task Handle_WithNotParticipant_ThrowsMatchDrawRequestException()
         {
             //Arrange
             var sut = new RequestDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new RequestDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
-            var match = Fixture.Create<Match>();
+            var match = Fixture.Build<Match>()
+                .With(x => x.AILevel, (int?)null)
+                .Create();
 
             MatchRepositoryMock.Setup(x => x.GetMatchById(matchCommand.MatchId)).ReturnsAsync(match);
 
@@ -74,6 +97,7 @@ namespace MatchService.UnitTests
             var matchCommand = new RequestDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var matchStatus = Fixture.Create<Generator<MatchStatus>>().First(s => s != MatchStatus.InProgress);
             var match = Fixture.Build<Match>()
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.Status, matchStatus)
                 .With(x => x.Creator, matchCommand.User)
                 .Create();
@@ -96,6 +120,7 @@ namespace MatchService.UnitTests
             var sut = new RequestDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new RequestDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
                 .With(x => x.DrawRequestedSide, Fixture.Create<MatchSide>())
@@ -119,6 +144,7 @@ namespace MatchService.UnitTests
             var sut = new RequestDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new RequestDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
                 .With(x => x.DrawRequestedSide, (MatchSide?)null)
@@ -144,6 +170,7 @@ namespace MatchService.UnitTests
             var sut = new RequestDrawHandler(MatchRepositoryMock.Object, PublishEndpoint.Object, MapperMock.Object, _expServiceMock.Object);
             var matchCommand = new RequestDrawCommand(It.IsAny<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
                 .With(x => x.Creator, matchCommand.User)
                 .With(x => x.DrawRequestedSide, (MatchSide?)null)
@@ -169,6 +196,7 @@ namespace MatchService.UnitTests
             var matchCommand = new RequestDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.MatchId, matchCommand.MatchId)
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.StartedAtUtc, DateTime.UtcNow)
                 .With(x => x.LastMoveMadeAtUtc, (DateTime?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
@@ -203,6 +231,7 @@ namespace MatchService.UnitTests
             var matchCommand = new RequestDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.MatchId, matchCommand.MatchId)
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.StartedAtUtc, DateTime.UtcNow - TimeSpan.FromMinutes(5))
                 .With(x => x.LastMoveMadeAtUtc, (DateTime?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
@@ -241,6 +270,7 @@ namespace MatchService.UnitTests
             var matchCommand = new RequestDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.MatchId, matchCommand.MatchId)
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.StartedAtUtc, DateTime.UtcNow)
                 .With(x => x.LastMoveMadeAtUtc, (DateTime?)null)
                 .With(x => x.Status, MatchStatus.InProgress)
@@ -276,6 +306,7 @@ namespace MatchService.UnitTests
             var matchCommand = new RequestDrawCommand(Fixture.Create<Guid>(), Fixture.Create<string>());
             var match = Fixture.Build<Match>()
                 .With(x => x.MatchId, matchCommand.MatchId)
+                .With(x => x.AILevel, (int?)null)
                 .With(x => x.StartedAtUtc, DateTime.UtcNow - TimeSpan.FromMinutes(5))
                 .With(x => x.LastMoveMadeAtUtc, (DateTime?)null)
                 .With(x => x.Status, MatchStatus.InProgress)

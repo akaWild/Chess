@@ -36,6 +36,9 @@ namespace MatchService.Features.RequestDraw
             if (match == null)
                 throw new MatchNotFoundException($"Match with id {request.MatchId} wasn't found");
 
+            if (match.AILevel != null)
+                throw new DrawRequestException("Draw can be requested only on human vs human match");
+
             if (request.User != match.Creator && request.User != match.Acceptor)
                 throw new DrawRequestException("Draw can be requested only by match participant");
 

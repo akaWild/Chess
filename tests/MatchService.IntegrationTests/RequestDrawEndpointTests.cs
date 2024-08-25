@@ -83,6 +83,25 @@ namespace MatchService.IntegrationTests
         }
 
         [Fact]
+        public async Task RequestDraw_WithVsBot()
+        {
+            //Arrange
+            var matchId = Guid.Parse("5AF2E004-6342-4FD1-B4F6-2E0A093D3025");
+            var hubConnection = HubConnectionHelper.GetHubConnection(HttpMessageHandler, token: _tolianToken, matchId: matchId.ToString());
+
+            SetConnectionHandlers(hubConnection);
+
+            //Act
+            await hubConnection.StartAsync();
+
+            Exception? exception = await Record.ExceptionAsync(async () => await hubConnection.InvokeAsync("RequestDraw", matchId));
+
+            //Assert
+            Assert.NotNull(exception);
+            Assert.Matches("only on human vs human match", exception.Message);
+        }
+
+        [Fact]
         public async Task RequestDraw_WithInvalidUser()
         {
             //Arrange

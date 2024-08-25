@@ -85,6 +85,18 @@ namespace MatchService.IntegrationTests.Utils
                 },
                 new Match
                 {
+                    MatchId = Guid.Parse("5AF2E004-6342-4FD1-B4F6-2E0A093D3025"),
+                    AILevel = 20,
+                    Creator = "Tolian",
+                    StartedAtUtc = DateTime.UtcNow,
+                    WhiteSidePlayer = "Tolian",
+                    ActingSide = MatchSide.White,
+                    Status = MatchStatus.InProgress,
+                    Acceptor = "Kolian",
+                    Board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                },
+                new Match
+                {
                     MatchId = Guid.Parse("88275D09-CC64-47E4-B433-7BE6B3DB47A1"),
                     Creator = "Tolian",
                     StartedAtUtc = DateTime.UtcNow,
