@@ -9,6 +9,7 @@ using MatchService.Features.CreateMatch;
 using MatchService.Features.GetCurrentMatch;
 using MatchService.Features.RejectDraw;
 using MatchService.Features.RequestDraw;
+using MatchService.Features.Resign;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Connections.Features;
@@ -388,6 +389,32 @@ namespace MatchService.UnitTests
 
             //Arrange
             _senderMock.Verify(x => x.Send(It.IsAny<RejectDrawCommand>(), CancellationToken.None), Times.Once);
+            _clientProxyMock.Verify(c => c.SendCoreAsync("MatchFinished", new object[] { matchFinishedDto }, CancellationToken.None), Times.Once);
+            _clientProxyMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task Resign_VerifyCalls()
+        {
+            //Arrange
+            var matchId = _fixture.Create<Guid>();
+            var matchFinishedDto = _fixture.Create<MatchFinishedDto>();
+
+            var hub = new MatchHub(_senderMock.Object)
+            {
+                Context = _contextMock.Object,
+                Groups = _groupsMock.Object,
+                Clients = _clientsMock.Object
+            };
+
+            _senderMock.Setup(x => x.Send(It.IsAny<ResignCommand>(), CancellationToken.None)).ReturnsAsync(matchFinishedDto);
+            _clientsMock.Setup(clients => clients.Group(matchId.ToString())).Returns(_clientProxyMock.Object);
+
+            //Act
+            await hub.Resign(matchId);
+
+            //Arrange
+            _senderMock.Verify(x => x.Send(It.IsAny<ResignCommand>(), CancellationToken.None), Times.Once);
             _clientProxyMock.Verify(c => c.SendCoreAsync("MatchFinished", new object[] { matchFinishedDto }, CancellationToken.None), Times.Once);
             _clientProxyMock.VerifyNoOtherCalls();
         }
